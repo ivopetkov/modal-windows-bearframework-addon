@@ -1,0 +1,33 @@
+{
+    "name": "ivopetkov/modal-windows-bearframework-addon",
+    "description": "Modal windows addon for Bear Framework",
+    "keywords": [
+        "modal",
+        "window",
+        "Bear Framework addon"
+    ],
+    "homepage": "https://github.com/ivopetkov/modal-windows-bearframework-addon",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ivo Petkov",
+            "email": "ivo@ivopetkov.com",
+            "homepage": "http://ivopetkov.com"
+        }
+    ],
+    "require": {
+        "php": "7.1.*|7.2.*|7.3.*|7.4.*|8.0.*",
+        "bearframework/bearframework": "1.*",
+        "ivopetkov/client-packages-bearframework-addon": "1.*",
+        "ivopetkov/server-requests-bearframework-addon": "1.*",
+        "ivopetkov/js-lightbox-bearframework-addon": "1.*"
+    },
+    "require-dev": {
+        "bearframework/addon-tests": "1.*"
+    },
+    "autoload": {
+        "files": [
+            "autoload.php"
+        ]
+    }
+}
