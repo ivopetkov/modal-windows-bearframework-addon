@@ -97,6 +97,16 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 }
             }
 
+            var handleError = function () {
+                hideLoading();
+                if (container !== null) {
+                    var previousWindow = container.lastChild;
+                    if (previousWindow !== null) {
+                        previousWindow.setAttribute('class', 'ipmdlwndwv');
+                    }
+                }
+            };
+
             showLoading();
             clientPackages.get('serverRequests').then(function (serverRequests) {
                 clientPackages.get('-ivopetkov-js-modal-windows-html5domdocument').then(function (html5DOMDocument) {
@@ -140,11 +150,11 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                                 windowContainer.mwClose = close;
                             });
                         } else {
-                            hideLoading();
+                            handleError();
                         }
-                    }).catch(hideLoading);
-                }).catch(hideLoading);
-            }).catch(hideLoading);
+                    }).catch(handleError);
+                }).catch(handleError);
+            }).catch(handleError);
         };
 
         var close = function () {
