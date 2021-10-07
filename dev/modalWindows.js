@@ -82,6 +82,59 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
 
     var container = null;
 
+    var bodyScrollbarsDisabled = false;
+    var bodyScrollbarsDisabledInverval = null;
+    var disableBodyScrollbars = function () {
+        if (!bodyScrollbarsDisabled) {
+            document.body.style.overflow = 'hidden';
+            if (document.body.scrollHeight > window.innerHeight) {
+                document.body.style.marginRight = getBodyScrollbarSize() + 'px';
+            }
+            bodyScrollbarsDisabledInverval = window.setInterval(function () {
+                if (container === null) {
+                    window.clearInterval(bodyScrollbarsDisabledInverval);
+                    document.body.style.overflow = 'auto';
+                    document.body.style.marginRight = 'auto';
+                    bodyScrollbarsDisabled = false;
+                }
+            }, 16);
+            bodyScrollbarsDisabled = true;
+        }
+    };
+
+    var bodyScroolbarSizeCache = null;
+    var getBodyScrollbarSize = function () {
+        if (bodyScroolbarSizeCache !== null) {
+            return bodyScroolbarSizeCache;
+        }
+
+        var inner = document.createElement('p');
+        inner.style.width = "100%";
+        inner.style.height = "200px";
+
+        var outer = document.createElement('div');
+        outer.style.position = "absolute";
+        outer.style.top = "-10000px";
+        outer.style.left = "-10000px";
+        outer.style.visibility = "hidden";
+        outer.style.width = "200px";
+        outer.style.height = "150px";
+        outer.style.overflow = "hidden";
+        outer.appendChild(inner);
+
+        document.body.appendChild(outer);
+        var w1 = inner.offsetWidth;
+        outer.style.overflow = 'scroll';
+        var w2 = inner.offsetWidth;
+        if (w1 === w2) {
+            w2 = outer.clientWidth;
+        }
+
+        document.body.removeChild(outer);
+
+        return bodyScroolbarSizeCache = w1 - w2;
+    };
+
     var make = function () {
         var windowContainer = null;
 
@@ -108,6 +161,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             };
 
             showLoading();
+
             clientPackages.get('serverRequests').then(function (serverRequests) {
                 clientPackages.get('-ivopetkov-js-modal-windows-html5domdocument').then(function (html5DOMDocument) {
                     serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(data), g: globalCssAdded ? 0 : 1 }).then(function (responseText) {
@@ -122,6 +176,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                                     container = document.createElement('div');
                                     container.setAttribute('class', 'ipmdlwndwsc');
                                     document.body.appendChild(container);
+                                    disableBodyScrollbars();
                                 }
                                 windowContainer = document.createElement('div');
                                 windowContainer.setAttribute('data-form-tooltip-container', 'true'); // needed by ivopetkov/form-bearframework-addon
