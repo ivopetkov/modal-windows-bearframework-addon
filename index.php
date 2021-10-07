@@ -265,15 +265,17 @@ $app->serverRequests
                 }
                 .ipmdlwndwsc [data-form-element-type="radio"]+[data-form-element-type="radio"]{
                     margin-top:10px;
+                }
+                .ipmdlwndwsc [data-form-component="tooltip"]{
+                    border-radius:4px;
+                    --form-tooltip-background-color:#c30000;
+                    font-size:14px;
+                    line-height:24px;
+                    font-family:Arial,Helvetica,sans-serif;
+                    color:#fff;
+                    font-weight:bold;
+                    padding:15px 18px;
                 }';
-                // .ipmdlwndwsc [data-form-component="tooltip"]{
-                //     border-radius:4px;
-                //     background-color:red;
-                //     font-size:15px;
-                // }
-                // .ipmdlwndwsc [data-form-component="tooltip"]:before{
-                //     border-color:red transparent;
-                // }
                 $result['s'] = '<head><style>' . $css . '</style></head>';
             }
         }

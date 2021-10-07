@@ -124,6 +124,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                                     document.body.appendChild(container);
                                 }
                                 windowContainer = document.createElement('div');
+                                windowContainer.setAttribute('data-form-tooltip-container', 'true'); // needed by ivopetkov/form-bearframework-addon
                                 container.appendChild(windowContainer);
                                 html5DOMDocument.insert('<div><div><div></div><div></div><div></div></div></div>', [windowContainer]);
                                 var windowPartsElement = windowContainer.firstChild.firstChild;
