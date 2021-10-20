@@ -223,7 +223,7 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="checkbox"]{
                     position:relative;
                     display:block;
-                    height:42px;
+                    min-height:42px;
                     text-align:left;
                     line-height:42px;
                     padding-left:60px;
@@ -236,6 +236,13 @@ $app->serverRequests
                     padding-bottom:7px;
                     margin-top:0;
                     line-height:' . $textLineHeight . ';
+                }
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="label"] a{
+                    font-family:' . $fontFamily . ';
+                    font-size:' . $fontSize . ';
+                    color:#000;
+                    line-height:' . $textLineHeight . ';
+                    text-decoration:underline;
                 }
                 .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]{
                     display: none;
