@@ -79,6 +79,7 @@ $app->serverRequests
                 $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(1){width:42px;height:42px;position:absolute;top:0;right:0;border-top-right-radius:6px;border-bottom-left-radius:4px;cursor:pointer;background-image:url(data:image/svg+xml;base64,' . base64_encode($closeButtonIcon) . ');background-repeat:no-repeat;background-position:center;background-size:16px;}'; // close button
                 $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(1):hover{background-color:#eee;}';
                 $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(1):active{background-color:#ddd;}';
+                $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(1):focus{background-color:#ddd;}';
                 $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(2){min-height:42px;font-family:' . $fontFamily . ';font-size:14px;line-height:14px;box-sizing:border-box;padding:20px ' . $fieldsSpacing . ' 0 ' . $fieldsSpacing . ';cursor:default;}'; // header
                 $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(3){padding:' . $fieldsSpacing . ';font-family:' . $fontFamily . ';font-size:' . $fontSize . ';line-height:' . $textLineHeight . ';}'; // content
                 $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-separator{border-bottom:1px solid var(--modal-window-content-separator-color);margin-top:var(--modal-window-content-spacing);margin-bottom:var(--modal-window-content-spacing);}';
@@ -112,13 +113,17 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"]:hover,
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:hover,
                 .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:hover{
-                    border:1px solid #bbb;
+                    border:' . $fieldBorderHover . ';
                 }
                 .ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"]:active,
+                .ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"]:focus,
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"]:active,
+                .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"]:focus,
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:active,
-                .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:hover{
-                    border:1px solid #aaa;
+                .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:focus,
+                .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:active,
+                .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:focus{
+                    border:' . $fieldBorderActive . ';
                 }
                 .ipmdlwndwsc [data-form-element-type] [data-form-element-component="label"]{
                     font-family:' . $fontFamily . ';
@@ -200,7 +205,7 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]{
                     display: none;
                 }
-                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]+span:before {
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]+span:before{
                     content:"";
                     display:block;
                     position:absolute;
@@ -214,7 +219,17 @@ $app->serverRequests
                     cursor:pointer;
                     box-sizing:border-box;
                 }
-                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]:checked+span:before {
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="label"]{
+                    display:inline-block;
+                }
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]+span:hover:before{
+                    border:' . $fieldBorderHover . ';
+                }
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]+span:active:before,
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]+span:focus:before{
+                    border:' . $fieldBorderActive . ';
+                }
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]:checked+span:before{
                     background-image:url(data:image/svg+xml;base64,' . base64_encode($radioButtonIcon) . ');
                     background-size:30px;
                     background-repeat:no-repeat;
@@ -244,10 +259,13 @@ $app->serverRequests
                     line-height:' . $textLineHeight . ';
                     text-decoration:underline;
                 }
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="label"] a:focus{
+                    background-color:' . $fieldBackground . ';
+                }
                 .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]{
                     display: none;
                 }
-                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]+span:before {
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]+span:before{
                     content:"";
                     display:block;
                     position:absolute;
@@ -261,7 +279,17 @@ $app->serverRequests
                     cursor:pointer;
                     box-sizing:border-box;
                 }
-                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]:checked+span:before {
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="label"]{
+                    display:inline-block;
+                }
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]+span:hover:before{
+                    border:' . $fieldBorderHover . ';
+                }
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]+span:active:before,
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]+span:focus:before{
+                    border:' . $fieldBorderActive . ';
+                }
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]:checked+span:before{
                     background-image:url(data:image/svg+xml;base64,' . base64_encode($checkboxButtonIcon) . ');
                     background-size:20px;
                     background-repeat:no-repeat;
