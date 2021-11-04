@@ -130,6 +130,12 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                                 html5DOMDocument.insert('<div><div><div></div><div></div><div></div></div></div>', [windowContainer]);
                                 var windowPartsElement = windowContainer.firstChild.firstChild;
                                 windowPartsElement.firstChild.addEventListener('click', close);
+                                windowPartsElement.firstChild.addEventListener('keydown', function (e) {
+                                    if (e.keyCode === 13) {
+                                        close();
+                                    }
+                                });
+                                windowPartsElement.firstChild.setAttribute('tabindex', '0');
                                 if (typeof result.c.width !== 'undefined') {
                                     windowPartsElement.style.width = result.c.width;
                                 }
