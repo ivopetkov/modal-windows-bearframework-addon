@@ -11,6 +11,7 @@ BearFramework\Addons::register('ivopetkov/modal-windows-bearframework-addon', __
     'require' => [
         'ivopetkov/client-packages-bearframework-addon',
         'ivopetkov/js-lightbox-bearframework-addon',
-        'ivopetkov/server-requests-bearframework-addon'
+        'ivopetkov/server-requests-bearframework-addon',
+        'ivopetkov/html5-dom-document-js-bearframework-addon'
     ]
 ]);

@@ -110,7 +110,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             showLoading();
 
             clientPackages.get('serverRequests').then(function (serverRequests) {
-                clientPackages.get('-ivopetkov-js-modal-windows-html5domdocument').then(function (html5DOMDocument) {
+                clientPackages.get('html5DOMDocument').then(function (html5DOMDocument) {
                     serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(data), g: globalCssAdded ? 0 : 1 }).then(function (responseText) {
                         var result = JSON.parse(responseText);
                         if (typeof result.s !== 'undefined') {

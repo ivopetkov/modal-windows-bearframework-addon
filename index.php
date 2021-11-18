@@ -22,9 +22,6 @@ $app->shortcuts
         return new IvoPetkov\BearFrameworkAddons\ModalWindows();
     });
 
-$context->assets
-    ->addDir('assets/public');
-
 $app->serverRequests
     ->add('-modal-window-open', function ($data) {
         $result = [];
@@ -323,8 +320,4 @@ $app->clientPackages
         //$package->addJSCode(file_get_contents($context->dir . '/dev/modalWindows.js'));
         $package->embedPackage('lightbox');
         $package->get = 'return ivoPetkov.bearFrameworkAddons.modalWindows;';
-    })
-    ->add('-ivopetkov-js-modal-windows-html5domdocument', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($context) {
-        $package->addJSFile($context->assets->getURL('assets/public/HTML5DOMDocument.min.js', ['cacheMaxAge' => 999999999, 'version' => 1]));
-        $package->get = 'return html5DOMDocument;';
     });
