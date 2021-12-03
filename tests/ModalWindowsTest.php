@@ -19,6 +19,10 @@ class ModalWindowsTest extends BearFramework\AddonTests\PHPUnitTestCase
     public function testOutput()
     {
         $app = $this->getApp();
-        $this->assertTrue(true);
+
+        $html = '<html><head><link rel="client-packages-embed" name="modalWindows"></head></html>';
+        $result = $app->clientPackages->process($html);
+
+        $this->assertTrue(strpos($result, 'ivoPetkov.bearFrameworkAddons.modalWindows=') !== false);
     }
 }
