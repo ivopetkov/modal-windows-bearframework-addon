@@ -94,17 +94,18 @@ $app->serverRequests
                     border:' . $fieldBorder . ';
                     border-radius:' . $fieldBorderRadius . ';
                     color:#000;
-                    box-sizing: border-box;
+                    box-sizing:border-box;
                     display:block;
                     height:48px;
-                    box-sizing:border-box;
                 }
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]{
                     padding:12px 17px;
                     line-height:24px;
-                }
-                .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]{
                     height:100px;
+                }
+                .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]{
+                    appearance:none;
+                    -webkit-appearance:none;
                 }
                 .ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"]:hover,
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"]:hover,
@@ -142,7 +143,7 @@ $app->serverRequests
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"],
                 .ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-button{
-                    box-sizing: border-box;
+                    box-sizing:border-box;
                     font-family:' . $fontFamily . ';
                     background-color:' . $fieldBackground . ';
                     border:' . $fieldBorder . ';
@@ -153,7 +154,6 @@ $app->serverRequests
                     color:#000;
                     text-align:center;
                     height:48px;
-                    box-sizing:border-box;
                     position:relative;
                     text-decoration:none;
                 }
@@ -182,73 +182,27 @@ $app->serverRequests
                 .ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-button:focus{
                     border:' . $fieldBorderActive . ';
                 }
-                .ipmdlwndwsc [data-form-element-type="radio"]{
-                    position:relative;
-                    display:block;
-                    min-height:42px;
+                .ipmdlwndwsc [data-form-element-type="radio"] > label,
+                .ipmdlwndwsc [data-form-element-type="checkbox"] > label{
+                    display:flex;
+                    flex-direction:row;
                     text-align:left;
                     line-height:42px;
-                    padding-left:60px;
                     box-sizing:border-box;
                     font-family:' . $fontFamily . ';
                     font-size:' . $fontSize . ';
                 }
-                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="label"]{
-                    padding-top:9px;
-                    padding-bottom:7px;
-                    margin-top:0;
-                    line-height:' . $textLineHeight . ';
-                }
-                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]{
-                    display: none;
-                }
-                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]+span:before{
-                    content:"";
-                    display:block;
-                    position:absolute;
-                    top:0;
-                    width:42px;
-                    height:42px;
-                    background:' . $fieldBackground . ';
-                    border:' . $fieldBorder . ';
-                    border-radius:50%;
-                    margin-left:-60px;
-                    cursor:pointer;
-                    box-sizing:border-box;
-                }
-                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="label"]{
-                    display:inline-block;
-                }
-                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]+span:hover:before{
-                    border:' . $fieldBorderHover . ';
-                }
-                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]+span:active:before,
-                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]+span:focus:before{
-                    border:' . $fieldBorderActive . ';
-                }
-                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]:checked+span:before{
-                    background-image:url(data:image/svg+xml;base64,' . base64_encode($radioButtonIcon) . ');
-                    background-size:30px;
-                    background-repeat:no-repeat;
-                    background-position:center;
-                }
-                .ipmdlwndwsc [data-form-element-type="checkbox"]{
-                    position:relative;
-                    display:block;
-                    min-height:42px;
-                    text-align:left;
-                    line-height:42px;
-                    padding-left:60px;
-                    box-sizing:border-box;
-                    font-family:' . $fontFamily . ';
-                    font-size:' . $fontSize . ';
-                }
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="label"],
                 .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="label"]{
                     padding-top:9px;
                     padding-bottom:7px;
+                    padding-left:18px;
                     margin-top:0;
                     line-height:' . $textLineHeight . ';
+                    display:inline-block;
+                    align-self:flex-start;
                 }
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="label"] a,
                 .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="label"] a{
                     font-family:' . $fontFamily . ';
                     font-size:' . $fontSize . ';
@@ -256,37 +210,45 @@ $app->serverRequests
                     line-height:' . $textLineHeight . ';
                     text-decoration:underline;
                 }
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="label"] a,
                 .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="label"] a:focus{
                     background-color:' . $fieldBackground . ';
                 }
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"],
                 .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]{
-                    display: none;
-                }
-                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]+span:before{
-                    content:"";
-                    display:block;
-                    position:absolute;
-                    top:0;
+                    align-self:flex-start;
+                    margin:0;
+                    appearance:none;
+                    -webkit-appearance:none;
+                    flex:0 0 auto;
                     width:42px;
                     height:42px;
                     background:' . $fieldBackground . ';
                     border:' . $fieldBorder . ';
                     border-radius:' . $fieldBorderRadius . ';
-                    margin-left:-60px;
                     cursor:pointer;
                     box-sizing:border-box;
                 }
-                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="label"]{
-                    display:inline-block;
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]{
+                    border-radius:50%;
                 }
-                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]+span:hover:before{
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]:hover,
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]:hover{
                     border:' . $fieldBorderHover . ';
                 }
-                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]+span:active:before,
-                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]+span:focus:before{
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]:active,
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]:focus,
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]:active,
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]:focus{
                     border:' . $fieldBorderActive . ';
                 }
-                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]:checked+span:before{
+                .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]:checked{
+                    background-image:url(data:image/svg+xml;base64,' . base64_encode($radioButtonIcon) . ');
+                    background-size:30px;
+                    background-repeat:no-repeat;
+                    background-position:center;
+                }
+                .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]:checked{
                     background-image:url(data:image/svg+xml;base64,' . base64_encode($checkboxButtonIcon) . ');
                     background-size:20px;
                     background-repeat:no-repeat;
