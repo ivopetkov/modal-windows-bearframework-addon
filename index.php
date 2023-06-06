@@ -107,6 +107,49 @@ $app->serverRequests
                     appearance:none;
                     -webkit-appearance:none;
                 }
+                .ipmdlwndwsc [data-form-element-type="image"] [data-form-element-component="button"]{
+                    width:100%;
+                    aspect-ratio:1/1;
+                    box-shadow:0 0 0 1px rgba(0,0,0,0.2) inset;
+                    border-radius:' . $fieldBorderRadius . ';
+                    background-color:' . $fieldBackground . ';
+                }
+                .ipmdlwndwsc [data-form-element-type="image"] [data-form-element-component="button"]:hover{
+                    box-shadow:0 0 0 1px rgba(0,0,0,0.25) inset;
+                }
+                .ipmdlwndwsc [data-form-element-type="image"] [data-form-element-component="button"]:active,
+                .ipmdlwndwsc [data-form-element-type="image"] [data-form-element-component="button"]:focus{
+                    box-shadow:0 0 0 1px rgba(0,0,0,0.3) inset;
+                }
+                .ipmdlwndwsc [data-form-element-type="image"] [data-form-element-component="text"]{
+                    font-size:' . $fontSize . ';
+                    padding:0 17px;
+                    line-height:48px;
+                    font-family:' . $fontFamily . ';
+                    width:100%;
+                    height:100%;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                }
+                .ipmdlwndwsc [data-form-element-type="image"] [data-form-element-component="clear-button"]{
+                    width:32px;
+                    height:32px;
+                    right:5px;
+                    top:5px;
+                    background-image:url(data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5" stroke-linecap="square" fill="none" color="#333"><path d="M21.039 2.961H2.96m11.621-1.29H9.418M4.253 8.125V21.04c0 .86.43 1.29 1.29 1.29h12.913c.861 0 1.291-.43 1.291-1.29V8.126" stroke-width="3.228"/></svg>') . ');
+                    border-radius:calc(' . $fieldBorderRadius . ' - 1px);
+                    background-size:13px;
+                    background-repeat:no-repeat;
+                    background-position:center center;
+                    background-color:rgba(0,0,0,0.7);
+                }
+                .ipmdlwndwsc [data-form-element-type="image"] [data-form-element-component="clear-button"]:hover{
+                    background-color:rgba(0,0,0,0.75);
+                }
+                .ipmdlwndwsc [data-form-element-type="image"] [data-form-element-component="clear-button"]:active{
+                    background-color:rgba(0,0,0,0.8);
+                }
                 .ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"]:hover,
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"]:hover,
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:hover,
@@ -132,16 +175,8 @@ $app->serverRequests
                     display:block;
                     margin-top:-2px;
                 }
-                .ipmdlwndwsc [data-form-element-type="image"] [data-form-element-component="button"]{
-                    width:250px;
-                    height:250px;
-                    border-radius:' . $fieldBorderRadius . ';
-                    background-color:' . $fieldBackground . ';
-                    color:#000;
-                    font-family:' . $fontFamily . ';
-                    font-size:' . $fontSize . ';
-                }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"],
+                .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"],
                 .ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-button{
                     box-sizing:border-box;
                     font-family:' . $fontFamily . ';
@@ -157,7 +192,8 @@ $app->serverRequests
                     position:relative;
                     text-decoration:none;
                 }
-                .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"]{
+                .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"],
+                .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"]{
                     display:block;
                 }
                 .ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-button{
@@ -171,14 +207,17 @@ $app->serverRequests
                     opacity:1;
                 }
                 @keyframes ipmdlwndwsc-fsb{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-                .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"][disabled]{
+                .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"][disabled],
+                .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"][disabled]{
                     color:#999;
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"]:not([disabled]):hover,
+                .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"]:not([disabled]):hover,
                 .ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-button:hover{
                     border:' . $fieldBorderHover . ';
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"]:not([disabled]):focus,
+                .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"]:not([disabled]):focus,
                 .ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-button:focus{
                     border:' . $fieldBorderActive . ';
                 }
