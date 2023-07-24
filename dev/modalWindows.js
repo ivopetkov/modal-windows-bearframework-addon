@@ -11,6 +11,10 @@ var ivoPetkov = ivoPetkov || {};
 ivoPetkov.bearFrameworkAddons = ivoPetkov.bearFrameworkAddons || {};
 ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modalWindows || (function () {
 
+    var globalCssAdded = false;
+
+    var container = null;
+
     Promise = window.Promise || function (callback) {
         var thenCallbacks = [];
         var catchCallback = null;
@@ -43,12 +47,25 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     var lightboxStatus = null; // 1 - loading, 2 - no loading
     var lightboxLoadingStatusCounter = 0;
 
+    var onBeforeEscKeyClose = function () {
+        setTimeout(function () {
+            if (container !== null && container.lastChild) {
+                var lastWindowContainer = container.lastChild;
+                if (lastWindowContainer.getAttribute('data-mw-disabled') !== null) {
+                    return null;
+                }
+                lastWindowContainer.mwClose();
+            }
+        }, 1);
+        return false;
+    };
+
     var showLightboxLoading = function () {
         lightboxLoadingStatusCounter++;
         if (lightboxStatus !== 1) {
             lightboxStatus = 1;
             clientPackages.get('lightbox').then(function (lightbox) { // its embeded
-                lightboxContext = lightbox.make({ showCloseButton: false });
+                lightboxContext = lightbox.make({ showCloseButton: false, onBeforeEscKeyClose: onBeforeEscKeyClose });
             });
         }
     };
@@ -62,7 +79,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         }
         if (lightboxStatus === 1) {
             lightboxStatus = 2;
-            return lightboxContext.open('', { showCloseButton: false, spacing: 0 });
+            return lightboxContext.open('', { showCloseButton: false, spacing: 0, onBeforeEscKeyClose: onBeforeEscKeyClose });
         } else {
             return new Promise(function (resolve, reject) {
                 resolve();
@@ -77,10 +94,6 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             lightboxContext = null;
         }
     };
-
-    var globalCssAdded = false;
-
-    var container = null;
 
     var make = function () {
         var windowContainer = null;
@@ -148,7 +161,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                                 var forms = windowPartsElement.querySelectorAll('form');
                                 for (var i = 0; i < forms.length; i++) {
                                     var form = forms[i];
-                                    form.addEventListener('submitstart', disable);
+                                    form.addEventListener('submitstart', disable); // todo fix for multiple
                                     form.addEventListener('submitend', enable);
                                 }
                                 window.setTimeout(function () {
@@ -224,6 +237,15 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         }
     };
 
+    var closeCurrent = function () {
+        if (container !== null) {
+            var lastWindow = container.lastChild;
+            if (lastWindow !== null) {
+                lastWindow.mwClose();
+            }
+        }
+    };
+
     var showLoading = function () {
         showLightboxLoading();
     };
@@ -240,6 +262,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     return {
         'open': open,
         'closeAll': closeAll,
+        'closeCurrent': closeCurrent,
         'showLoading': showLoading,
         'hideLoading': hideLoading
     };

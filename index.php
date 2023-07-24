@@ -53,6 +53,7 @@ $app->serverRequests
                 $fieldsSpacing = '21px';
                 $fontFamily = 'Arial,Helvetica,sans-serif';
                 $fontSize = '15px';
+                $hintFontSize = '13px';
                 $fieldBackground = '#f5f5f5';
                 $fieldBorder = '1px solid ' . $fieldBorderColor;
                 $fieldBorderHover = '1px solid ' . $fieldBorderColorHover;
@@ -171,9 +172,26 @@ $app->serverRequests
                     font-size:' . $fontSize . ';
                     color:#000;
                     padding-bottom:4px;
-                    cursor: default;
+                    cursor:default;
                     display:block;
                     margin-top:-2px;
+                }
+                .ipmdlwndwsc [data-form-element-type] [data-form-element-component="hint"]{
+                    font-family:' . $fontFamily . ';
+                    font-size:' . $fontSize . ';
+                    color:#555;
+                    padding-bottom:4px;
+                    cursor:default;
+                    display:block;
+                    margin-top:-2px;
+                }
+                .ipmdlwndwsc [data-form-element-type] [data-form-element-component="hint-after"]{
+                    font-family:' . $fontFamily . ';
+                    font-size:' . $hintFontSize . ';
+                    color:#555;
+                    padding-top:2px;
+                    cursor:default;
+                    display:block;
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"],
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"],
@@ -291,7 +309,7 @@ $app->serverRequests
                     background-image:url(data:image/svg+xml;base64,' . base64_encode($checkboxButtonIcon) . ');
                     background-size:20px;
                     background-repeat:no-repeat;
-                    background-position:11px 11px;
+                    background-position:11px 10px;
                 }
                 .ipmdlwndwsc [data-form-element-type]+[data-form-element-type]{
                     margin-top:' . $fieldsSpacing . ';
