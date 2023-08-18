@@ -12,6 +12,7 @@ ivoPetkov.bearFrameworkAddons = ivoPetkov.bearFrameworkAddons || {};
 ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modalWindows || (function () {
 
     var globalCssAdded = false;
+    var contentCache = {};
 
     var container = null;
 
@@ -62,12 +63,17 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
 
     var showLightboxLoading = function () {
         lightboxLoadingStatusCounter++;
-        if (lightboxStatus !== 1) {
-            lightboxStatus = 1;
-            clientPackages.get('lightbox').then(function (lightbox) { // its embeded
-                lightboxContext = lightbox.make({ showCloseButton: false, onBeforeEscKeyClose: onBeforeEscKeyClose });
-            });
-        }
+        return new Promise(function (resolve, reject) {
+            if (lightboxStatus !== 1) {
+                lightboxStatus = 1;
+                clientPackages.get('lightbox').then(function (lightbox) { // its embeded
+                    lightboxContext = lightbox.make({ showCloseButton: false, onBeforeEscKeyClose: onBeforeEscKeyClose });
+                    resolve();
+                });
+            } else {
+                resolve();
+            }
+        });
     };
 
     var hideLightboxLoading = function () {
@@ -98,10 +104,15 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     var make = function () {
         var windowContainer = null;
 
-        var open = function (name, data) {
+        var open = function (name, data, options) {
             if (typeof data === 'undefined') {
                 data = {};
             }
+            if (typeof options === 'undefined') {
+                options = {};
+            }
+
+            var onOpen = typeof options.onOpen !== 'undefined' ? options.onOpen : null;
 
             if (container !== null) {
                 var otherWindows = container.childNodes;
@@ -120,62 +131,83 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 }
             };
 
-            showLoading();
+            var cacheKey = name + '$' + JSON.stringify(data);
 
-            clientPackages.get('serverRequests').then(function (serverRequests) {
-                clientPackages.get('html5DOMDocument').then(function (html5DOMDocument) {
-                    serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(data), g: globalCssAdded ? 0 : 1 }).then(function (responseText) {
-                        var result = JSON.parse(responseText);
-                        if (typeof result.s !== 'undefined') {
-                            html5DOMDocument.insert(result.s);
-                            globalCssAdded = true;
-                        }
-                        if (typeof result.c !== 'undefined') {
-                            hideLightboxLoading().then(function () {
-                                if (container === null) {
-                                    container = document.createElement('div');
-                                    container.setAttribute('class', 'ipmdlwndwsc');
-                                    document.body.appendChild(container);
-                                }
-                                windowContainer = document.createElement('div');
-                                windowContainer.setAttribute('data-form-tooltip-container', 'true'); // needed by ivopetkov/form-bearframework-addon
-                                container.appendChild(windowContainer);
-                                html5DOMDocument.insert('<div><div><div></div><div></div><div></div></div></div>', [windowContainer]);
-                                var windowPartsElement = windowContainer.firstChild.firstChild;
-                                windowPartsElement.firstChild.addEventListener('click', close);
-                                windowPartsElement.firstChild.addEventListener('keydown', function (e) {
-                                    if (e.keyCode === 13) {
-                                        close();
-                                    }
+            var create = function (contentData, addToCache) {
+                if (container === null) {
+                    container = document.createElement('div');
+                    container.setAttribute('class', 'ipmdlwndwsc');
+                    document.body.appendChild(container);
+                }
+                windowContainer = document.createElement('div');
+                windowContainer.setAttribute('data-form-tooltip-container', 'true'); // needed by ivopetkov/form-bearframework-addon
+                container.appendChild(windowContainer);
+                html5DOMDocument.insert('<div><div><div></div><div></div><div></div></div></div>', [windowContainer]);
+                var windowPartsElement = windowContainer.firstChild.firstChild;
+                windowPartsElement.firstChild.addEventListener('click', close);
+                windowPartsElement.firstChild.addEventListener('keydown', function (e) {
+                    if (e.keyCode === 13) {
+                        close();
+                    }
+                });
+                windowPartsElement.firstChild.setAttribute('tabindex', '0');
+                if (typeof contentData.width !== 'undefined') {
+                    windowPartsElement.style.width = contentData.width;
+                }
+                if (typeof contentData.title !== 'undefined') {
+                    windowPartsElement.childNodes[1].innerText = contentData.title;
+                }
+                if (typeof contentData.content !== 'undefined') {
+                    html5DOMDocument.insert(contentData.content, [windowPartsElement.lastChild]);
+                }
+                var forms = windowPartsElement.querySelectorAll('form');
+                for (var i = 0; i < forms.length; i++) {
+                    var form = forms[i];
+                    form.addEventListener('submitstart', disable); // todo fix for multiple
+                    form.addEventListener('submitend', enable);
+                }
+                window.setTimeout(function () {
+                    windowContainer.setAttribute('class', 'ipmdlwndwv');
+                }, 16);
+
+                if (onOpen !== null) {
+                    onOpen(windowContainer);
+                }
+
+                windowContainer.mwClose = close;
+
+                if (addToCache && typeof contentData.cacheTTL !== 'undefined') {
+                    contentCache[cacheKey] = [contentData, (new Date()).getTime() + contentData.cacheTTL * 1000];
+                }
+            };
+
+            showLightboxLoading().then(function () {
+                if (typeof contentCache[cacheKey] !== 'undefined' && contentCache[cacheKey][1] > (new Date()).getTime()) {
+                    hideLightboxLoading().then(function () {
+                        create(contentCache[cacheKey][0], false);
+                    });
+                    return;
+                }
+
+                clientPackages.get('serverRequests').then(function (serverRequests) {
+                    clientPackages.get('html5DOMDocument').then(function (html5DOMDocument) {
+                        serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(data), g: globalCssAdded ? 0 : 1 }).then(function (responseText) {
+                            var result = JSON.parse(responseText);
+                            if (typeof result.s !== 'undefined') {
+                                html5DOMDocument.insert(result.s);
+                                globalCssAdded = true;
+                            }
+                            if (typeof result.c !== 'undefined') {
+                                hideLightboxLoading().then(function () {
+                                    create(result.c, true);
                                 });
-                                windowPartsElement.firstChild.setAttribute('tabindex', '0');
-                                if (typeof result.c.width !== 'undefined') {
-                                    windowPartsElement.style.width = result.c.width;
-                                }
-                                if (typeof result.c.title !== 'undefined') {
-                                    windowPartsElement.childNodes[1].innerText = result.c.title;
-                                }
-                                if (typeof result.c.content !== 'undefined') {
-                                    html5DOMDocument.insert(result.c.content, [windowPartsElement.lastChild]);
-                                }
-                                var forms = windowPartsElement.querySelectorAll('form');
-                                for (var i = 0; i < forms.length; i++) {
-                                    var form = forms[i];
-                                    form.addEventListener('submitstart', disable); // todo fix for multiple
-                                    form.addEventListener('submitend', enable);
-                                }
-                                window.setTimeout(function () {
-                                    windowContainer.setAttribute('class', 'ipmdlwndwv');
-                                }, 16);
-
-                                windowContainer.mwClose = close;
-                            });
-                        } else {
-                            handleError();
-                        }
+                            } else {
+                                handleError();
+                            }
+                        }).catch(handleError);
                     }).catch(handleError);
                 }).catch(handleError);
-            }).catch(handleError);
+            });
         };
 
         var close = function () {
@@ -218,9 +250,12 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         };
     };
 
-    var open = function (name, data) {
+    var open = function (name, data, options) {
+        if (typeof options === 'undefined') {
+            options = {};
+        }
         var window = make();
-        window.open(name, data);
+        window.open(name, data, options);
         return window;
     };
 
@@ -246,6 +281,10 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         }
     };
 
+    var hasOpened = function () {
+        return lightboxContext !== null;
+    };
+
     var showLoading = function () {
         showLightboxLoading();
     };
@@ -264,6 +303,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         'closeAll': closeAll,
         'closeCurrent': closeCurrent,
         'showLoading': showLoading,
-        'hideLoading': hideLoading
+        'hideLoading': hideLoading,
+        'hasOpened': hasOpened
     };
 }());
