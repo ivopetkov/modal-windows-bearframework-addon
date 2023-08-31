@@ -142,25 +142,36 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 windowContainer = document.createElement('div');
                 windowContainer.setAttribute('data-form-tooltip-container', 'true'); // needed by ivopetkov/form-bearframework-addon
                 container.appendChild(windowContainer);
-                html5DOMDocument.insert('<div><div><div></div><div></div><div></div></div></div>', [windowContainer]);
-                var windowPartsElement = windowContainer.firstChild.firstChild;
-                windowPartsElement.firstChild.addEventListener('click', close);
-                windowPartsElement.firstChild.addEventListener('keydown', function (e) {
+                var html = '';
+                html += '<div data-modal-window-component="header">';
+                html += '<div data-modal-window-component="header-title"></div>';
+                html += '<div data-modal-window-component="header-buttons">';
+                html += '<div data-modal-window-component="header-button-close"></div>';
+                html += '</div>';
+                html += '</div>';
+                html += '<div data-modal-window-component="content"></div>';
+                html5DOMDocument.insert('<div><div data-modal-window-component="window">' + html + '</div></div>', [windowContainer]);
+                var windowElement = windowContainer.firstChild.firstChild;
+                var titleElement = windowElement.querySelector('[data-modal-window-component="header-title"]');
+                var closeButtonElement = windowElement.querySelector('[data-modal-window-component="header-button-close"]');
+                var contentElement = windowElement.querySelector('[data-modal-window-component="content"]');
+                closeButtonElement.addEventListener('click', close);
+                closeButtonElement.addEventListener('keydown', function (e) {
                     if (e.keyCode === 13) {
                         close();
                     }
                 });
-                windowPartsElement.firstChild.setAttribute('tabindex', '0');
+                closeButtonElement.setAttribute('tabindex', '0');
                 if (typeof contentData.width !== 'undefined') {
-                    windowPartsElement.style.width = contentData.width;
+                    windowElement.style.width = contentData.width;
                 }
                 if (typeof contentData.title !== 'undefined') {
-                    windowPartsElement.childNodes[1].innerText = contentData.title;
+                    titleElement.innerText = contentData.title;
                 }
                 if (typeof contentData.content !== 'undefined') {
-                    html5DOMDocument.insert(contentData.content, [windowPartsElement.lastChild]);
+                    html5DOMDocument.insert(contentData.content, [contentElement]);
                 }
-                var forms = windowPartsElement.querySelectorAll('form');
+                var forms = windowElement.querySelectorAll('form');
                 for (var i = 0; i < forms.length; i++) {
                     var form = forms[i];
                     form.addEventListener('submitstart', disable); // todo fix for multiple

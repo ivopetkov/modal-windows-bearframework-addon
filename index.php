@@ -37,7 +37,7 @@ $app->serverRequests
                     $result['c'] = [];
                 }
             }
-            if (isset($data['g']) && (int)$data['g']) { // include globa data
+            if (isset($data['g']) && (int)$data['g']) { // include global data
                 $css = '.ipmdlwndwsc{position:fixed;z-index:10020000;top:0;left:0;width:100%;height:100%;}';
                 $css .= '.ipmdlwndwsc>div{position:fixed;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:15px;overflow:auto;-webkit-transition:transform 300ms;transition:transform 300ms;transform:translate(0,100vh);}';
                 $css .= '.ipmdlwndwsc>div>div{display:flex;justify-content:center;align-items:center;min-height:100%;}';
@@ -47,40 +47,35 @@ $app->serverRequests
                 $css .= '.ipmdlwndwsc>div>div>div{min-height:200px;min-width:200px;position:relative;}';
                 $css .= '.ipmdlwndwsc>div[data-mw-disabled]>div>div:before{content:"";z-index:10030000;display:block;position:absolute;width:100%;height:100%;}';
 
-                $fieldBorderColor = '#ccc';
-                $fieldBorderColorHover = '#bbb';
-                $fieldBorderColorActive = '#aaa';
-                $fieldsSpacing = '21px';
                 $fontFamily = 'Arial,Helvetica,sans-serif';
                 $fontSize = '15px';
                 $hintFontSize = '13px';
                 $fieldBackground = '#f5f5f5';
-                $fieldBorder = '1px solid ' . $fieldBorderColor;
-                $fieldBorderHover = '1px solid ' . $fieldBorderColorHover;
-                $fieldBorderActive = '1px solid ' . $fieldBorderColorActive;
-                $fieldBorderRadius = '4px';
                 $textLineHeight = '26px';
 
                 $closeButtonIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#999"><path d="M11.47 10l7.08-7.08c.4-.4.4-1.06 0-1.47-.4-.4-1.06-.4-1.47 0L10 8.53 2.92 1.45c-.4-.4-1.07-.4-1.47 0-.4.4-.4 1.06 0 1.47L8.53 10l-7.08 7.08c-.4.4-.4 1.07 0 1.47.2.2.47.3.74.3.23 0 .5-.1.7-.3l7.1-7.08 7.07 7.08c.2.2.47.3.73.3.3 0 .56-.1.76-.3.4-.4.4-1.06 0-1.47L11.46 10z"/></svg>';
                 $radioButtonIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="90.708664" height="90.708664" viewBox="0 0 24 24" fill="#111"><circle cx="12" cy="12" r="4.276312"/></svg>';
                 $checkboxButtonIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 13l5 5L20 7"/></svg>';
 
-                $css .= '.ipmdlwndwsc>div>div>div{background-color:#fff;border-radius:6px;'
-                    . '--modal-window-content-spacing:' . $fieldsSpacing . ';'
+                $css .= '.ipmdlwndwsc>div>div>div{background-color:#fff;border-radius:var(--modal-window-border-radius);'
+                    . '--modal-window-border-radius:6px;'
+                    . '--modal-window-content-spacing:21px;'
                     . '--modal-window-content-spacing-half:calc(var(--modal-window-content-spacing)/2);'
-                    . '--modal-window-content-field-border:' . $fieldBorder . ';'
-                    . '--modal-window-content-field-border-radius:' . $fieldBorderRadius . ';'
-                    . '--modal-window-content-field-border-hover:' . $fieldBorderHover . ';'
-                    . '--modal-window-content-field-border-active:' . $fieldBorderActive . ';'
-                    . '--modal-window-content-separator-color:' . $fieldBorderColor . ';'
+                    . '--modal-window-content-field-border:1px solid #ccc;'
+                    . '--modal-window-content-field-border-hover:1px solid #bbb;'
+                    . '--modal-window-content-field-border-active:1px solid #aaa;'
+                    . '--modal-window-content-field-border-radius:4px;'
+                    . '--modal-window-content-separator-color:#ccc;'
                     . '}'; // container
-                $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(1){width:42px;height:42px;position:absolute;top:0;right:0;border-top-right-radius:6px;border-bottom-left-radius:4px;cursor:pointer;background-image:url(data:image/svg+xml;base64,' . base64_encode($closeButtonIcon) . ');background-repeat:no-repeat;background-position:center;background-size:16px;}'; // close button
-                $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(1):hover{background-color:#eee;}';
-                $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(1):active{background-color:#ddd;}';
-                $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(1):focus{background-color:#ddd;}';
-                $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(2){min-height:42px;font-family:' . $fontFamily . ';font-size:14px;line-height:14px;box-sizing:border-box;padding:20px ' . $fieldsSpacing . ' 0 ' . $fieldsSpacing . ';cursor:default;}'; // header
-                $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(3){padding:' . $fieldsSpacing . ';font-family:' . $fontFamily . ';font-size:' . $fontSize . ';line-height:' . $textLineHeight . ';}'; // content
-                $css .= '.ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-separator{border-bottom:1px solid var(--modal-window-content-separator-color);margin-top:var(--modal-window-content-spacing);margin-bottom:var(--modal-window-content-spacing);}';
+                $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header"]{display:flex;flex-direction:row;}';
+                $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header-buttons"]>*{width:42px;height:42px;border-bottom-left-radius:calc(var(--modal-window-border-radius) / 2);border-bottom-right-radius:calc(var(--modal-window-border-radius) / 2);cursor:pointer;background-repeat:no-repeat;background-position:center;outline:none;}';
+                $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header-buttons"]>*:hover{background-color:#eee;}';
+                $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header-buttons"]>*:active{background-color:#ddd;}';
+                $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header-buttons"]>*:focus{background-color:#ddd;}';
+                $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header-button-close"]{border-top-right-radius:var(--modal-window-border-radius);border-bottom-right-radius:0;background-image:url(data:image/svg+xml;base64,' . base64_encode($closeButtonIcon) . ');background-size:16px;}';
+                $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header-title"]{flex:1 1 auto;min-height:42px;font-family:' . $fontFamily . ';font-size:14px;line-height:' . $textLineHeight . ';box-sizing:border-box;padding:15px var(--modal-window-content-spacing) 0 var(--modal-window-content-spacing);cursor:default;}'; // header
+                $css .= '.ipmdlwndwsc>div>div>div>[data-modal-window-component="content"]{padding:var(--modal-window-content-spacing);font-family:' . $fontFamily . ';font-size:' . $fontSize . ';line-height:' . $textLineHeight . ';}'; // content
+                $css .= '.ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] .modal-window-content-separator{border-bottom:1px solid var(--modal-window-content-separator-color);margin-top:var(--modal-window-content-spacing);margin-bottom:var(--modal-window-content-spacing);}';
 
                 $css .= '.ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"],
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"],
@@ -92,12 +87,13 @@ $app->serverRequests
                     line-height:48px;
                     font-family:' . $fontFamily . ';
                     background-color:' . $fieldBackground . ';
-                    border:' . $fieldBorder . ';
-                    border-radius:' . $fieldBorderRadius . ';
+                    border:var(--modal-window-content-field-border);
+                    border-radius:var(--modal-window-content-field-border-radius);
                     color:#000;
                     box-sizing:border-box;
                     display:block;
                     height:48px;
+                    outline:none;
                 }
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]{
                     padding:12px 17px;
@@ -112,7 +108,7 @@ $app->serverRequests
                     width:100%;
                     aspect-ratio:1/1;
                     box-shadow:0 0 0 1px rgba(0,0,0,0.2) inset;
-                    border-radius:' . $fieldBorderRadius . ';
+                    border-radius:var(--modal-window-content-field-border-radius);
                     background-color:' . $fieldBackground . ';
                 }
                 .ipmdlwndwsc [data-form-element-type="image"] [data-form-element-component="button"]:hover{
@@ -139,7 +135,7 @@ $app->serverRequests
                     right:5px;
                     top:5px;
                     background-image:url(data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5" stroke-linecap="square" fill="none" color="#333"><path d="M21.039 2.961H2.96m11.621-1.29H9.418M4.253 8.125V21.04c0 .86.43 1.29 1.29 1.29h12.913c.861 0 1.291-.43 1.291-1.29V8.126" stroke-width="3.228"/></svg>') . ');
-                    border-radius:calc(' . $fieldBorderRadius . ' - 1px);
+                    border-radius:calc(var(--modal-window-content-field-border-radius) - 1px);
                     background-size:13px;
                     background-repeat:no-repeat;
                     background-position:center center;
@@ -155,7 +151,7 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"]:hover,
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:hover,
                 .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:hover{
-                    border:' . $fieldBorderHover . ';
+                    border:var(--modal-window-content-field-border-hover);
                 }
                 .ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"]:active,
                 .ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"]:focus,
@@ -165,7 +161,7 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:focus,
                 .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:active,
                 .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:focus{
-                    border:' . $fieldBorderActive . ';
+                    border:var(--modal-window-content-field-border-active);
                 }
                 .ipmdlwndwsc [data-form-element-type] [data-form-element-component="label"]{
                     font-family:' . $fontFamily . ';
@@ -195,13 +191,13 @@ $app->serverRequests
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"],
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"],
-                .ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-button{
+                .ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] .modal-window-content-button{
                     box-sizing:border-box;
                     font-family:' . $fontFamily . ';
                     background-color:' . $fieldBackground . ';
-                    border:' . $fieldBorder . ';
+                    border:var(--modal-window-content-field-border);
                     font-size:' . $fontSize . ';
-                    border-radius:' . $fieldBorderRadius . ';
+                    border-radius:var(--modal-window-content-field-border-radius);
                     padding:0 17px;
                     line-height:48px;
                     color:#000;
@@ -213,8 +209,9 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"],
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"]{
                     display:block;
+                    outline:none;
                 }
-                .ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-button{
+                .ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] .modal-window-content-button{
                     display:inline-block;
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"]:before{
@@ -231,13 +228,13 @@ $app->serverRequests
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"]:not([disabled]):hover,
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"]:not([disabled]):hover,
-                .ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-button:hover{
-                    border:' . $fieldBorderHover . ';
+                .ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] .modal-window-content-button:hover{
+                    border:var(--modal-window-content-field-border-hover);
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"]:not([disabled]):focus,
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"]:not([disabled]):focus,
-                .ipmdlwndwsc>div>div>div>div:nth-child(3) .modal-window-content-button:focus{
-                    border:' . $fieldBorderActive . ';
+                .ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] .modal-window-content-button:focus{
+                    border:var(--modal-window-content-field-border-active);
                 }
                 .ipmdlwndwsc [data-form-element-type="radio"] > label,
                 .ipmdlwndwsc [data-form-element-type="checkbox"] > label{
@@ -281,8 +278,8 @@ $app->serverRequests
                     width:42px;
                     height:42px;
                     background:' . $fieldBackground . ';
-                    border:' . $fieldBorder . ';
-                    border-radius:' . $fieldBorderRadius . ';
+                    border:var(--modal-window-content-field-border);
+                    border-radius:var(--modal-window-content-field-border-radius);
                     cursor:pointer;
                     box-sizing:border-box;
                 }
@@ -291,13 +288,13 @@ $app->serverRequests
                 }
                 .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]:hover,
                 .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]:hover{
-                    border:' . $fieldBorderHover . ';
+                    border:var(--modal-window-content-field-border-hover);
                 }
                 .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]:active,
                 .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]:focus,
                 .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]:active,
                 .ipmdlwndwsc [data-form-element-type="checkbox"] [data-form-element-component="input"]:focus{
-                    border:' . $fieldBorderActive . ';
+                    border:var(--modal-window-content-field-border-active);
                 }
                 .ipmdlwndwsc [data-form-element-type="radio"] [data-form-element-component="input"]:checked{
                     background-image:url(data:image/svg+xml;base64,' . base64_encode($radioButtonIcon) . ');
@@ -312,7 +309,7 @@ $app->serverRequests
                     background-position:11px 10px;
                 }
                 .ipmdlwndwsc [data-form-element-type]+[data-form-element-type]{
-                    margin-top:' . $fieldsSpacing . ';
+                    margin-top:var(--modal-window-content-spacing);
                 }
                 .ipmdlwndwsc [data-form-element-type="radio"]+[data-form-element-type="radio"]{
                     margin-top:10px;
