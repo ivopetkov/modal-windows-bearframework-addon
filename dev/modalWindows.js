@@ -49,16 +49,26 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     var lightboxLoadingStatusCounter = 0;
 
     var onBeforeEscKeyClose = function () {
-        setTimeout(function () {
-            if (container !== null && container.lastChild) {
-                var lastWindowContainer = container.lastChild;
+        if (container !== null && container.lastChild) {
+            var lastWindowContainer = container.lastChild;
+            if (lightboxStatus === 1) { // loading
+                hideLightboxLoading().then(function () {
+                    lastWindowContainer.setAttribute('class', 'ipmdlwndwv');
+                });
+                return false; // cancel esc
+            } else {
                 if (lastWindowContainer.getAttribute('data-mw-disabled') !== null) {
-                    return null;
+                    return false; // cancel esc
                 }
-                lastWindowContainer.mwClose();
+                if (lastWindowContainer.mwClose()) { // closeLightbox is called inside if needed
+                    return false; // cancel esc
+                }
             }
-        }, 1);
-        return false;
+        } else {
+            if (lightboxStatus !== null) {
+                closeLightbox();
+            }
+        }
     };
 
     var showLightboxLoading = function () {
@@ -95,11 +105,14 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
 
     var closeLightbox = function () {
         if (lightboxContext !== null) {
+            lightboxLoadingStatusCounter = 0;
             lightboxStatus = null;
             lightboxContext.close();
             lightboxContext = null;
         }
     };
+
+    var openVersion = 0;
 
     var make = function () {
         var windowContainer = null;
@@ -111,6 +124,9 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             if (typeof options === 'undefined') {
                 options = {};
             }
+
+            openVersion++;
+            var currentOpenVersion = openVersion;
 
             var onOpen = typeof options.onOpen !== 'undefined' ? options.onOpen : null;
 
@@ -203,6 +219,12 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 clientPackages.get('serverRequests').then(function (serverRequests) {
                     clientPackages.get('html5DOMDocument').then(function (html5DOMDocument) {
                         serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(data), g: globalCssAdded ? 0 : 1 }).then(function (responseText) {
+                            if (openVersion !== currentOpenVersion) {
+                                return;
+                            }
+                            if (lightboxStatus !== 1) { // 1 - loading
+                                return;
+                            }
                             var result = JSON.parse(responseText);
                             if (typeof result.s !== 'undefined') {
                                 html5DOMDocument.insert(result.s);
@@ -221,7 +243,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             });
         };
 
-        var close = function () {
+        var close = function () { // return true if closed
             if (windowContainer !== null) {
                 var previousWindow = windowContainer.previousSibling;
                 windowContainer.setAttribute('class', 'ipmdlwndwh');
@@ -235,10 +257,13 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                         previousWindow.setAttribute('class', 'ipmdlwndwv');
                     }
                 }, 300);
-                if (container.childNodes.length === 1) {
+                var remainingWindowsCount = container.childNodes.length - 1;
+                if (remainingWindowsCount === 0) {
                     closeLightbox();
                 }
+                return true;
             }
+            return false;
         };
 
         var enable = function () {
