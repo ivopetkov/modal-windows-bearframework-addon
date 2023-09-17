@@ -57,6 +57,10 @@ $app->serverRequests
                 $radioButtonIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="90.708664" height="90.708664" viewBox="0 0 24 24" fill="#111"><circle cx="12" cy="12" r="4.276312"/></svg>';
                 $checkboxButtonIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 13l5 5L20 7"/></svg>';
 
+                $nextIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M7.495048 2.990047L16.505003 12l-9.009955 9.009953" stroke-width="2.5"/></svg>';
+                $previousIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M16.504952 21.009953L7.494996 12l9.009956-9.009953" stroke-width="2.5"/></svg>';
+                $clearIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="#999" stroke-width="2.5" stroke-linecap="square" fill="none" color="#333"><path d="M21.039 2.961H2.96m11.621-1.29H9.418M4.253 8.125V21.04c0 .86.43 1.29 1.29 1.29h12.913c.861 0 1.291-.43 1.291-1.29V8.126" stroke-width="3.228"/></svg>';
+
                 $css .= '.ipmdlwndwsc>div>div>div{background-color:#fff;border-radius:var(--modal-window-border-radius);'
                     . '--modal-window-border-radius:6px;'
                     . '--modal-window-content-spacing:21px;'
@@ -80,7 +84,8 @@ $app->serverRequests
                 $css .= '.ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"],
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"],
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"],
-                .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]{
+                .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="button"]{
                     width:100%;
                     font-size:' . $fontSize . ';
                     padding:0 17px;
@@ -147,10 +152,14 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="image"] [data-form-element-component="clear-button"]:active{
                     background-color:rgba(0,0,0,0.8);
                 }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="button"]{
+                    text-overflow:ellipsis;white-space:nowrap;overflow:hidden;
+                }
                 .ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"]:hover,
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"]:hover,
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:hover,
-                .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:hover{
+                .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:hover,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="button"]:hover{
                     border:var(--modal-window-content-field-border-hover);
                 }
                 .ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"]:active,
@@ -160,7 +169,10 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:active,
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:focus,
                 .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:active,
-                .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:focus{
+                .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:focus,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="button"]:active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="button"]:focus,
+                .ipmdlwndwsc [data-form-element-type="datetime"][data-form-element-data-opened] [data-form-element-component="button"]{
                     border:var(--modal-window-content-field-border-active);
                 }
                 .ipmdlwndwsc [data-form-element-type] [data-form-element-component="label"]{
@@ -313,6 +325,143 @@ $app->serverRequests
                 }
                 .ipmdlwndwsc [data-form-element-type="radio"]+[data-form-element-type="radio"]{
                     margin-top:10px;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="picker-tooltip"]{
+                    --tooltip-background-color:' . $fieldBackground . ';
+                    --tooltip-border:var(--modal-window-content-field-border-active);
+                    --tooltip-border-radius:var(--modal-window-content-field-border-radius);
+                    min-width:260px;
+                    max-width:550px;
+                    width:100%;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="picker"]{
+                    padding:7px;
+                    box-sizing:border-box;
+                    user-select:none;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="header"]{
+                    justify-content:right;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month-button"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year-button"]{
+                    height:30px;
+                    line-height:30px;
+                    font-family:' . $fontFamily . ';
+                    font-size:' . $fontSize . ';
+                    border-radius:var(--modal-window-content-field-border-radius);
+                    padding:0 9px;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="previous-button"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="next-button"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="clear-button"]{
+                    width:30px;
+                    background-size:13px;
+                    background-repeat:no-repeat;
+                    background-position:center center;
+                    border-radius:var(--modal-window-content-field-border-radius);
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="next-button"]{
+                    background-image:url(data:image/svg+xml;base64,' . base64_encode($nextIcon) . ');
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="previous-button"]{
+                    background-image:url(data:image/svg+xml;base64,' . base64_encode($previousIcon) . ');
+                    margin-left:5px;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="clear-button"]{
+                    background-image:url(data:image/svg+xml;base64,' . base64_encode($clearIcon) . ');
+                    margin-right:auto;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month-button"]:hover,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year-button"]:hover,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="previous-button"]:hover,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="next-button"]:hover,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="clear-button"]:hover{
+                    background-color:rgba(0,0,0,0.1);
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month-button"]:active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month-button"]:focus,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month-button"][data-form-element-data-opened],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year-button"]:active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year-button"]:focus,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year-button"][data-form-element-data-opened],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="previous-button"]:active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="previous-button"]:focus,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="next-button"]:active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="next-button"]:focus,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="clear-button"]:active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="clear-button"]:focus{
+                    background-color:rgba(0,0,0,0.15);
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="day"]{
+                    text-align:center;
+                    height:30px;
+                    line-height:30px;
+                    text-transform:uppercase;
+                    font-family:' . $fontFamily . ';
+                    font-size:10px;
+                    color:#aaa;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="date"]{
+                    text-align:center;
+                    height:30px;
+                    line-height:30px;
+                    font-family:' . $fontFamily . ';
+                    font-size:' . $fontSize . ';
+                    border-radius:var(--modal-window-content-field-border-radius);
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="date"]:not([data-form-element-data-selected]):hover{
+                    background-color:rgba(0,0,0,0.1);
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="date"]:not([data-form-element-data-selected]):active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="date"]:not([data-form-element-data-selected]):focus{
+                    background-color:rgba(0,0,0,0.15);
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-data-month="other"]{
+                    opacity:0.3;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="date"][data-form-element-data-today]:not([data-form-element-data-selected]){
+                    background-color:#999;
+                    color:#fff;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="date"][data-form-element-data-selected]{
+                    background-color:#555;
+                    color:#fff;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="months-tooltip"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="years-tooltip"]{
+                    --tooltip-background-color:' . $fieldBackground . ';
+                    --tooltip-border:var(--modal-window-content-field-border-active);
+                    --tooltip-border-radius:var(--modal-window-content-field-border-radius);
+                    width:170px;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="months"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="years"]{
+                    padding:7px;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"]{
+                    width:100%;
+                    height:30px;
+                    line-height:30px;
+                    font-family:' . $fontFamily . ';
+                    font-size:' . $fontSize . ';
+                    text-align:center;
+                    border-radius:var(--modal-window-content-field-border-radius);
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month"]:not([data-form-element-data-selected]):hover,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"]:not([data-form-element-data-selected]):hover{
+                    background-color:rgba(0,0,0,0.1);
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month"]:not([data-form-element-data-selected]):active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month"]:not([data-form-element-data-selected]):focus,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"]:not([data-form-element-data-selected]):active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"]:not([data-form-element-data-selected]):focus{
+                    background-color:rgba(0,0,0,0.15);
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month"][data-form-element-data-selected],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"][data-form-element-data-selected]{
+                    background-color:#555;
+                    color:#fff;
                 }
                 .ipmdlwndwsc [data-form-component="tooltip"]{
                     border-radius:4px;
