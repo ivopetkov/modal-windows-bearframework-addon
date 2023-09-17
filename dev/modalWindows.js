@@ -211,6 +211,9 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             showLightboxLoading().then(function () {
                 if (typeof contentCache[cacheKey] !== 'undefined' && contentCache[cacheKey][1] > (new Date()).getTime()) {
                     hideLightboxLoading().then(function () {
+                        if (lightboxStatus === null) {
+                            return;
+                        }
                         create(contentCache[cacheKey][0], false);
                     });
                     return;
