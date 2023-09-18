@@ -45,13 +45,14 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     };
 
     var lightboxContext = null;
-    var lightboxStatus = null; // 1 - loading, 2 - no loading
+    var lightboxStatus = null; // 1 - loading, 2 - empty (no loading)
     var lightboxLoadingStatusCounter = 0;
 
     var onBeforeEscKeyClose = function () {
         if (container !== null && container.lastChild) {
             var lastWindowContainer = container.lastChild;
             if (lightboxStatus === 1) { // loading
+                openVersion++;
                 hideLightboxLoading().then(function () {
                     lastWindowContainer.setAttribute('class', 'ipmdlwndwv');
                 });
@@ -66,15 +67,15 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             }
         } else {
             if (lightboxStatus !== null) {
-                closeLightbox();
+                closeAll();
             }
         }
     };
 
-    var showLightboxLoading = function () {
+    var showLightboxLoading = function () { // show lightbox's loading screen
         lightboxLoadingStatusCounter++;
         return new Promise(function (resolve, reject) {
-            if (lightboxStatus !== 1) {
+            if (lightboxStatus !== 1) { // not loading
                 lightboxStatus = 1;
                 clientPackages.get('lightbox').then(function (lightbox) { // its embeded
                     lightboxContext = lightbox.make({ showCloseButton: false, onBeforeEscKeyClose: onBeforeEscKeyClose });
@@ -86,14 +87,17 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         });
     };
 
-    var hideLightboxLoading = function () {
+    var hideLightboxLoading = function () { // hide loading but show empty screen
         lightboxLoadingStatusCounter--;
-        if (lightboxLoadingStatusCounter !== 0) {
+        if (lightboxLoadingStatusCounter < 0) {
+            lightboxLoadingStatusCounter = 0;
+        }
+        if (lightboxLoadingStatusCounter > 0) {
             return new Promise(function (resolve, reject) {
-                resolve(); // what to return ??
+                resolve();
             });
         }
-        if (lightboxStatus === 1) {
+        if (lightboxStatus === 1) { // loading
             lightboxStatus = 2;
             return lightboxContext.open('', { showCloseButton: false, spacing: 0, onBeforeEscKeyClose: onBeforeEscKeyClose });
         } else {
@@ -211,7 +215,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             showLightboxLoading().then(function () {
                 if (typeof contentCache[cacheKey] !== 'undefined' && contentCache[cacheKey][1] > (new Date()).getTime()) {
                     hideLightboxLoading().then(function () {
-                        if (lightboxStatus === null) {
+                        if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
                             return;
                         }
                         create(contentCache[cacheKey][0], false);
@@ -222,24 +226,21 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 clientPackages.get('serverRequests').then(function (serverRequests) {
                     clientPackages.get('html5DOMDocument').then(function (html5DOMDocument) {
                         serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(data), g: globalCssAdded ? 0 : 1 }).then(function (responseText) {
-                            if (openVersion !== currentOpenVersion) {
-                                return;
-                            }
-                            if (lightboxStatus !== 1) { // 1 - loading
-                                return;
-                            }
-                            var result = JSON.parse(responseText);
-                            if (typeof result.s !== 'undefined') {
-                                html5DOMDocument.insert(result.s);
-                                globalCssAdded = true;
-                            }
-                            if (typeof result.c !== 'undefined') {
-                                hideLightboxLoading().then(function () {
+                            hideLightboxLoading().then(function () {
+                                if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
+                                    return;
+                                }
+                                var result = JSON.parse(responseText);
+                                if (typeof result.s !== 'undefined') {
+                                    html5DOMDocument.insert(result.s);
+                                    globalCssAdded = true;
+                                }
+                                if (typeof result.c !== 'undefined') {
                                     create(result.c, true);
-                                });
-                            } else {
-                                handleError();
-                            }
+                                } else {
+                                    handleError();
+                                }
+                            });
                         }).catch(handleError);
                     }).catch(handleError);
                 }).catch(handleError);
@@ -247,6 +248,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         };
 
         var close = function () { // return true if closed
+            openVersion++;
             if (windowContainer !== null) {
                 var previousWindow = windowContainer.previousSibling;
                 windowContainer.setAttribute('class', 'ipmdlwndwh');
@@ -299,16 +301,24 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     };
 
     var closeAll = function () {
-        if (container !== null) {
-            var otherWindows = container.childNodes;
-            for (var i = otherWindows.length - 2; i >= 0; i--) {
-                container.removeChild(otherWindows[i]);
+        return new Promise(function (resolve, reject) {
+            if (container !== null && container.childNodes.length > 0) {
+                var otherWindows = container.childNodes;
+                for (var i = otherWindows.length - 2; i >= 0; i--) {
+                    container.removeChild(otherWindows[i]);
+                }
+                var lastWindow = container.firstChild;
+                if (lastWindow !== null) {
+                    lastWindow.mwClose();
+                }
+                resolve();
+            } else {
+                openVersion++;
+                hideLoading()
+                    .then(resolve)
+                    .catch(reject);
             }
-            var lastWindow = container.firstChild;
-            if (lastWindow !== null) {
-                lastWindow.mwClose();
-            }
-        }
+        });
     };
 
     var closeCurrent = function () {
@@ -325,16 +335,23 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     };
 
     var showLoading = function () {
-        showLightboxLoading();
+        return new Promise(function (resolve, reject) {
+            showLightboxLoading()
+                .then(resolve)
+                .catch(reject);
+        });
     };
 
     var hideLoading = function () {
-        hideLightboxLoading();
-        if (container === null || container.childNodes.length === 0) {
-            closeLightbox();
-        } else {
-            // todo
-        }
+        return new Promise(function (resolve, reject) {
+            hideLightboxLoading().then(function () {
+                if (container === null || container.childNodes.length === 0) {
+                    closeLightbox();
+                }
+                resolve();
+            }).catch(reject);
+        });
+
     };
 
     return {
