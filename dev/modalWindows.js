@@ -53,7 +53,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             var lastWindowContainer = container.lastChild;
             if (lightboxStatus === 1) { // loading
                 openVersion++;
-                hideLightboxLoading().then(function () {
+                hideLightboxLoading(lastWindowContainer.mwCloseOnEscKey).then(function () {
                     lastWindowContainer.setAttribute('class', 'ipmdlwndwv');
                 });
                 return false; // cancel esc
@@ -72,13 +72,13 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         }
     };
 
-    var showLightboxLoading = function () { // show lightbox's loading screen
+    var showLightboxLoading = function (closeOnEscKey) { // show lightbox's loading screen
         lightboxLoadingStatusCounter++;
         return new Promise(function (resolve, reject) {
             if (lightboxStatus !== 1) { // not loading
                 lightboxStatus = 1;
                 clientPackages.get('lightbox').then(function (lightbox) { // its embeded
-                    lightboxContext = lightbox.make({ showCloseButton: false, onBeforeEscKeyClose: onBeforeEscKeyClose });
+                    lightboxContext = lightbox.make({ showCloseButton: false, spacing: 0, closeOnEscKey: closeOnEscKey, onBeforeEscKeyClose: onBeforeEscKeyClose });
                     resolve();
                 });
             } else {
@@ -87,7 +87,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         });
     };
 
-    var hideLightboxLoading = function () { // hide loading but show empty screen
+    var hideLightboxLoading = function (closeOnEscKey) { // hide loading but show empty screen
         lightboxLoadingStatusCounter--;
         if (lightboxLoadingStatusCounter < 0) {
             lightboxLoadingStatusCounter = 0;
@@ -99,7 +99,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         }
         if (lightboxStatus === 1) { // loading
             lightboxStatus = 2;
-            return lightboxContext.open('', { showCloseButton: false, spacing: 0, onBeforeEscKeyClose: onBeforeEscKeyClose });
+            return lightboxContext.open('', { showCloseButton: false, spacing: 0, closeOnEscKey: closeOnEscKey, onBeforeEscKeyClose: onBeforeEscKeyClose, resolveBeforeHTMLAdded: true });
         } else {
             return new Promise(function (resolve, reject) {
                 resolve();
@@ -133,6 +133,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             var currentOpenVersion = openVersion;
 
             var onOpen = typeof options.onOpen !== 'undefined' ? options.onOpen : null;
+            var closeOnEscKey = typeof options.closeOnEscKey !== 'undefined' ? options.closeOnEscKey : true;
 
             if (container !== null) {
                 var otherWindows = container.childNodes;
@@ -206,15 +207,16 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 }
 
                 windowContainer.mwClose = close;
+                windowContainer.mwCloseOnEscKey = closeOnEscKey;
 
                 if (addToCache && typeof contentData.cacheTTL !== 'undefined') {
                     contentCache[cacheKey] = [contentData, (new Date()).getTime() + contentData.cacheTTL * 1000];
                 }
             };
 
-            showLightboxLoading().then(function () {
+            showLightboxLoading(closeOnEscKey).then(function () {
                 if (typeof contentCache[cacheKey] !== 'undefined' && contentCache[cacheKey][1] > (new Date()).getTime()) {
-                    hideLightboxLoading().then(function () {
+                    hideLightboxLoading(closeOnEscKey).then(function () {
                         if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
                             return;
                         }
@@ -226,7 +228,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 clientPackages.get('serverRequests').then(function (serverRequests) {
                     clientPackages.get('html5DOMDocument').then(function (html5DOMDocument) {
                         serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(data), g: globalCssAdded ? 0 : 1 }).then(function (responseText) {
-                            hideLightboxLoading().then(function () {
+                            hideLightboxLoading(closeOnEscKey).then(function () {
                                 if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
                                     return;
                                 }
@@ -334,9 +336,13 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         return lightboxContext !== null;
     };
 
-    var showLoading = function () {
+    var showLoading = function (options) {
+        if (typeof options === 'undefined') {
+            options = {};
+        }
+        var closeOnEscKey = typeof options.closeOnEscKey !== 'undefined' ? options.closeOnEscKey : true;
         return new Promise(function (resolve, reject) {
-            showLightboxLoading()
+            showLightboxLoading(closeOnEscKey)
                 .then(resolve)
                 .catch(reject);
         });
@@ -344,7 +350,12 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
 
     var hideLoading = function () {
         return new Promise(function (resolve, reject) {
-            hideLightboxLoading().then(function () {
+            var closeOnEscKey = true;
+            if (container !== null && container.lastChild) {
+                var lastWindowContainer = container.lastChild;
+                closeOnEscKey = lastWindowContainer.mwCloseOnEscKey;
+            }
+            hideLightboxLoading(closeOnEscKey).then(function () {
                 if (container === null || container.childNodes.length === 0) {
                     closeLightbox();
                 }
