@@ -16,6 +16,13 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
 
     var container = null;
 
+    var closeButtonText = '';
+
+    var initialize = function (data) {
+        closeButtonText = data[0];
+        return this;
+    };
+
     Promise = window.Promise || function (callback) {
         var thenCallbacks = [];
         var catchCallback = null;
@@ -48,13 +55,23 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     var lightboxStatus = null; // 1 - loading, 2 - empty (no loading)
     var lightboxLoadingStatusCounter = 0;
 
+    var setWindowVisibility = function (windowContainer, visible) {
+        if (visible) {
+            windowContainer.setAttribute('class', 'ipmdlwndwv');
+            windowContainer.removeAttribute('inert');
+        } else {
+            windowContainer.setAttribute('class', 'ipmdlwndwvh');
+            windowContainer.setAttribute('inert', 'true');
+        }
+    };
+
     var onBeforeEscKeyClose = function () {
         if (container !== null && container.lastChild) {
             var lastWindowContainer = container.lastChild;
             if (lightboxStatus === 1) { // loading
                 openVersion++;
                 hideLightboxLoading(lastWindowContainer.mwCloseOnEscKey).then(function () {
-                    lastWindowContainer.setAttribute('class', 'ipmdlwndwv');
+                    setWindowVisibility(lastWindowContainer, true);
                 });
                 return false; // cancel esc
             } else {
@@ -138,7 +155,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             if (container !== null) {
                 var otherWindows = container.childNodes;
                 for (var i = 0; i < otherWindows.length; i++) {
-                    otherWindows[i].setAttribute('class', 'ipmdlwndwvh');
+                    setWindowVisibility(otherWindows[i], false);
                 }
             }
 
@@ -147,7 +164,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 if (container !== null) {
                     var previousWindow = container.lastChild;
                     if (previousWindow !== null) {
-                        previousWindow.setAttribute('class', 'ipmdlwndwv');
+                        setWindowVisibility(previousWindow, true);
                     }
                 }
             };
@@ -167,7 +184,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 html += '<div data-modal-window-component="header">';
                 html += '<div data-modal-window-component="header-title"></div>';
                 html += '<div data-modal-window-component="header-buttons">';
-                html += '<div data-modal-window-component="header-button-close"></div>';
+                html += '<div data-modal-window-component="header-button-close" tabindex="0" role="button" title="' + closeButtonText + '"></div>';
                 html += '</div>';
                 html += '</div>';
                 html += '<div data-modal-window-component="content"></div>';
@@ -182,7 +199,6 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                         close();
                     }
                 });
-                closeButtonElement.setAttribute('tabindex', '0');
                 if (typeof contentData.width !== 'undefined') {
                     windowElement.style.width = contentData.width;
                 }
@@ -199,7 +215,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                     form.addEventListener('submitend', enable);
                 }
                 window.setTimeout(function () {
-                    windowContainer.setAttribute('class', 'ipmdlwndwv');
+                    setWindowVisibility(windowContainer, true);
                 }, 16);
 
                 if (onOpen !== null) {
@@ -261,7 +277,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                         container = null;
                     }
                     if (previousWindow !== null) {
-                        previousWindow.setAttribute('class', 'ipmdlwndwv');
+                        setWindowVisibility(previousWindow, true);
                     }
                 }, 300);
                 var remainingWindowsCount = container.childNodes.length - 1;
@@ -276,12 +292,14 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         var enable = function () {
             if (windowContainer !== null) {
                 windowContainer.removeAttribute('data-mw-disabled');
+                windowContainer.removeAttribute('inert');
             }
         };
 
         var disable = function () {
             if (windowContainer !== null) {
                 windowContainer.setAttribute('data-mw-disabled', '1');
+                windowContainer.setAttribute('inert', 'true');
             }
         };
 
@@ -366,6 +384,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     };
 
     return {
+        'initialize': initialize,
         'open': open,
         'closeAll': closeAll,
         'closeCurrent': closeCurrent,

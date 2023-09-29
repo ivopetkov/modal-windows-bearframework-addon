@@ -17,6 +17,14 @@ $context->classes
     ->add('IvoPetkov\BearFrameworkAddons\ModalWindows', 'classes/ModalWindows.php')
     ->add('IvoPetkov\BearFrameworkAddons\ModalWindows\Internal\Utilities', 'classes/ModalWindows/Internal/Utilities.php');
 
+$app->localization
+    ->addDictionary('en', function () use ($context) {
+        return include $context->dir . '/locales/en.php';
+    })
+    ->addDictionary('bg', function () use ($context) {
+        return include $context->dir . '/locales/bg.php';
+    });
+
 $app->shortcuts
     ->add('modalWindows', function () {
         return new IvoPetkov\BearFrameworkAddons\ModalWindows();
@@ -484,5 +492,7 @@ $app->clientPackages
         $package->addJSCode(include $context->dir . '/assets/modalWindows.min.js.php');
         //$package->addJSCode(file_get_contents($context->dir . '/dev/modalWindows.js'));
         $package->embedPackage('lightbox');
-        $package->get = 'return ivoPetkov.bearFrameworkAddons.modalWindows;';
+
+        $data = [__('ivopetkov.modalWindows.close')];
+        $package->get = 'return ivoPetkov.bearFrameworkAddons.modalWindows.initialize(' . json_encode($data) . ');';
     });

@@ -9,6 +9,7 @@
 
 BearFramework\Addons::register('ivopetkov/modal-windows-bearframework-addon', __DIR__, [
     'require' => [
+        'bearframework/localization-addon',
         'ivopetkov/client-packages-bearframework-addon',
         'ivopetkov/js-lightbox-bearframework-addon',
         'ivopetkov/server-requests-bearframework-addon',
