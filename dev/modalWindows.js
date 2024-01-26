@@ -184,6 +184,9 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 html += '<div data-modal-window-component="header">';
                 html += '<div data-modal-window-component="header-title"></div>';
                 html += '<div data-modal-window-component="header-buttons">';
+                if (typeof contentData.headerButtons !== 'undefined') {
+                    html += contentData.headerButtons.join('');
+                }
                 html += '<div data-modal-window-component="header-button-close" tabindex="0" role="button" title="' + closeButtonText + '"></div>';
                 html += '</div>';
                 html += '</div>';

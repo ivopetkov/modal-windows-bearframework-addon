@@ -80,6 +80,7 @@ $app->serverRequests
                     . '--modal-window-content-separator-color:#ccc;'
                     . '}'; // container
                 $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header"]{display:flex;flex-direction:row;}';
+                $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header-buttons"]{display:flex;flex-direction:row;}';
                 $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header-buttons"]>*{width:42px;height:42px;border-bottom-left-radius:calc(var(--modal-window-border-radius) / 2);border-bottom-right-radius:calc(var(--modal-window-border-radius) / 2);cursor:pointer;background-repeat:no-repeat;background-position:center;outline:none;}';
                 $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header-buttons"]>*:hover{background-color:#eee;}';
                 $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header-buttons"]>*:active{background-color:#ddd;}';
