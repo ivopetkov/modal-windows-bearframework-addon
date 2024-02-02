@@ -212,6 +212,7 @@ $app->serverRequests
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"],
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="ok-button"],
                 .ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] .modal-window-content-button{
                     box-sizing:border-box;
                     font-family:' . $fontFamily . ';
@@ -228,7 +229,8 @@ $app->serverRequests
                     text-decoration:none;
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"],
-                .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"]{
+                .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="ok-button"]{
                     display:block;
                     outline:none;
                 }
@@ -244,16 +246,18 @@ $app->serverRequests
                 }
                 @keyframes ipmdlwndwsc-fsb{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"][disabled],
-                .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"][disabled]{
+                .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"][disabled],{
                     color:#999;
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"]:not([disabled]):hover,
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"]:not([disabled]):hover,
-                .ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] .modal-window-content-button:hover{
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="ok-button"]:hover,
+                .ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] .modal-window-content-button:hover,{
                     border:var(--modal-window-content-field-border-hover);
                 }
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"]:not([disabled]):focus,
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"]:not([disabled]):focus,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="ok-button"]:focus,
                 .ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] .modal-window-content-button:focus{
                     border:var(--modal-window-content-field-border-active);
                 }
@@ -364,6 +368,7 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="next-button"],
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="clear-button"]{
                     width:30px;
+                    height:30px;
                     background-size:13px;
                     background-repeat:no-repeat;
                     background-position:center center;
@@ -444,11 +449,17 @@ $app->serverRequests
                     width:170px;
                 }
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="months"],
-                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="years"]{
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="years"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-hours"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-minutes"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-seconds"]{
                     padding:7px;
                 }
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month"],
-                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"]{
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-hour"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-minute"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-second"]{
                     width:100%;
                     height:30px;
                     line-height:30px;
@@ -458,17 +469,29 @@ $app->serverRequests
                     border-radius:var(--modal-window-content-field-border-radius);
                 }
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month"]:not([data-form-element-data-selected]):hover,
-                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"]:not([data-form-element-data-selected]):hover{
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"]:not([data-form-element-data-selected]):hover,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-hour"]:not([data-form-element-data-selected]):hover,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-minute"]:not([data-form-element-data-selected]):hover,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-second"]:not([data-form-element-data-selected]):hover{
                     background-color:rgba(0,0,0,0.1);
                 }
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month"]:not([data-form-element-data-selected]):active,
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month"]:not([data-form-element-data-selected]):focus,
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"]:not([data-form-element-data-selected]):active,
-                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"]:not([data-form-element-data-selected]):focus{
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"]:not([data-form-element-data-selected]):focus,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-hour"]:not([data-form-element-data-selected]):active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-hour"]:not([data-form-element-data-selected]):focus,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-minute"]:not([data-form-element-data-selected]):active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-minute"]:not([data-form-element-data-selected]):focus,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-second"]:not([data-form-element-data-selected]):active,
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-second"]:not([data-form-element-data-selected]):focus{
                     background-color:rgba(0,0,0,0.15);
                 }
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="month"][data-form-element-data-selected],
-                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"][data-form-element-data-selected]{
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="year"][data-form-element-data-selected],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-hour"][data-form-element-data-selected],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-minute"][data-form-element-data-selected],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-second"][data-form-element-data-selected]{
                     background-color:#555;
                     color:#fff;
                 }
