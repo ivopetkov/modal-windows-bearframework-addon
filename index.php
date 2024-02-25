@@ -35,14 +35,16 @@ $app->serverRequests
         $result = [];
         if (isset($data['i'], $data['d'])) {
             $name = $data['i'];
-            $callData = json_decode($data['d'], true);
-            if (!is_array($callData)) {
-                $callData = [];
-            }
-            if (isset(Utilities::$modalWindows[$name])) {
-                $result['c'] = call_user_func(Utilities::$modalWindows[$name][0], $callData);
-                if (!is_array($result['c'])) {
-                    $result['c'] = [];
+            if ($name !== '') {
+                $callData = json_decode($data['d'], true);
+                if (!is_array($callData)) {
+                    $callData = [];
+                }
+                if (isset(Utilities::$modalWindows[$name])) {
+                    $result['c'] = call_user_func(Utilities::$modalWindows[$name][0], $callData);
+                    if (!is_array($result['c'])) {
+                        $result['c'] = [];
+                    }
                 }
             }
             if (isset($data['g']) && (int)$data['g']) { // include global data
@@ -89,6 +91,9 @@ $app->serverRequests
                 $css .= '.ipmdlwndwsc>div>div>div [data-modal-window-component="header-title"]{flex:1 1 auto;min-height:42px;font-family:' . $fontFamily . ';font-size:14px;line-height:' . $textLineHeight . ';box-sizing:border-box;padding:15px var(--modal-window-content-spacing) 0 var(--modal-window-content-spacing);cursor:default;}'; // header
                 $css .= '.ipmdlwndwsc>div>div>div>[data-modal-window-component="content"]{padding:var(--modal-window-content-spacing);font-family:' . $fontFamily . ';font-size:' . $fontSize . ';line-height:' . $textLineHeight . ';}'; // content
                 $css .= '.ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] .modal-window-content-separator{border-bottom:1px solid var(--modal-window-content-separator-color);margin-top:var(--modal-window-content-spacing);margin-bottom:var(--modal-window-content-spacing);}';
+                $css .= '.ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] > .modal-window-content-separator:first-child{margin-top:-2px;}';
+
+                $css .= '.ipmdlwndwsc [data-modal-window-component="content-message"]{text-align:center;padding-bottom:calc(var(--modal-window-content-spacing) + 40px);}';
 
                 $css .= '.ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"],
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"],
@@ -210,6 +215,8 @@ $app->serverRequests
                     cursor:default;
                     display:block;
                 }
+                .ipmdlwndwsc [data-modal-window-component="content-button-ok"]{cursor:pointer;}
+                .ipmdlwndwsc [data-modal-window-component="content-button-ok"],
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"],
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"],
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="ok-button"],
@@ -228,6 +235,7 @@ $app->serverRequests
                     position:relative;
                     text-decoration:none;
                 }
+                .ipmdlwndwsc [data-modal-window-component="content-button-ok"],
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"],
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"],
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="ok-button"]{
@@ -249,12 +257,14 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"][disabled],{
                     color:#999;
                 }
+                .ipmdlwndwsc [data-modal-window-component="content-button-ok"]:hover,
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"]:not([disabled]):hover,
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"]:not([disabled]):hover,
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="ok-button"]:hover,
                 .ipmdlwndwsc>div>div>div>[data-modal-window-component="content"] .modal-window-content-button:hover,{
                     border:var(--modal-window-content-field-border-hover);
                 }
+                .ipmdlwndwsc [data-modal-window-component="content-button-ok"]:focus,
                 .ipmdlwndwsc [data-form-element-type="submit-button"] [data-form-element-component="button"]:not([disabled]):focus,
                 .ipmdlwndwsc [data-form-element-type="button"] [data-form-element-component="button"]:not([disabled]):focus,
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="ok-button"]:focus,
@@ -302,7 +312,7 @@ $app->serverRequests
                     flex:0 0 auto;
                     width:42px;
                     height:42px;
-                    background:' . $fieldBackground . ';
+                    background-color:' . $fieldBackground . ';
                     border:var(--modal-window-content-field-border);
                     border-radius:var(--modal-window-content-field-border-radius);
                     cursor:pointer;

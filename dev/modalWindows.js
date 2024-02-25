@@ -133,12 +133,18 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         }
     };
 
+    var escapeText = (text) => {
+        let div = document.createElement('div');
+        div.innerText = text;
+        return div.innerHTML;
+    };
+
     var openVersion = 0;
 
     var make = function () {
         var windowContainer = null;
 
-        var open = function (name, data, options) {
+        var open = function (name, data, options, type) {
             if (typeof data === 'undefined') {
                 data = {};
             }
@@ -169,7 +175,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 }
             };
 
-            var cacheKey = name + '$' + JSON.stringify(data);
+            var cacheKey = name + '$' + type + '$' + JSON.stringify(data);
 
             var create = function (contentData, addToCache) {
                 if (container === null) {
@@ -206,7 +212,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                     windowElement.style.width = contentData.width;
                 }
                 if (typeof contentData.title !== 'undefined') {
-                    titleElement.innerText = contentData.title;
+                    titleElement.innerHTML = escapeText(contentData.title).split("\n").join("<br>");
                 }
                 if (typeof contentData.content !== 'undefined') {
                     html5DOMDocument.insert(contentData.content, [contentElement]);
@@ -233,39 +239,56 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 }
             };
 
-            showLightboxLoading(closeOnEscKey).then(function () {
-                if (typeof contentCache[cacheKey] !== 'undefined' && contentCache[cacheKey][1] > (new Date()).getTime()) {
+            var contentData = null;
+            if (type === 'm') { // message
+                var messageHTML = '<div data-modal-window-component="content-message">' + escapeText(data.m).split("\n").join('<br>') + '</div><div data-modal-window-component="content-button-ok">OK</div>';
+                contentData = { width: '400px', content: messageHTML };
+            }
+            if (contentData !== null && globalCssAdded) {
+                showLightboxLoading(closeOnEscKey).then(function () {
                     hideLightboxLoading(closeOnEscKey).then(function () {
-                        if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
-                            return;
-                        }
-                        create(contentCache[cacheKey][0], false);
+                        create(contentData, false);
                     });
-                    return;
-                }
+                });
+            } else {
+                showLightboxLoading(closeOnEscKey).then(function () {
+                    if (typeof contentCache[cacheKey] !== 'undefined' && contentCache[cacheKey][1] > (new Date()).getTime()) {
+                        hideLightboxLoading(closeOnEscKey).then(function () {
+                            if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
+                                return;
+                            }
+                            create(contentCache[cacheKey][0], false);
+                        });
+                        return;
+                    }
 
-                clientPackages.get('serverRequests').then(function (serverRequests) {
-                    clientPackages.get('html5DOMDocument').then(function (html5DOMDocument) {
-                        serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(data), g: globalCssAdded ? 0 : 1 }).then(function (responseText) {
-                            hideLightboxLoading(closeOnEscKey).then(function () {
-                                if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
-                                    return;
-                                }
-                                var result = JSON.parse(responseText);
-                                if (typeof result.s !== 'undefined') {
-                                    html5DOMDocument.insert(result.s);
-                                    globalCssAdded = true;
-                                }
-                                if (typeof result.c !== 'undefined') {
-                                    create(result.c, true);
-                                } else {
-                                    handleError();
-                                }
-                            });
+                    clientPackages.get('serverRequests').then(function (serverRequests) {
+                        clientPackages.get('html5DOMDocument').then(function (html5DOMDocument) {
+                            serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(contentData !== null ? {} : data), g: globalCssAdded ? 0 : 1 }).then(function (responseText) {
+                                hideLightboxLoading(closeOnEscKey).then(function () {
+                                    if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
+                                        return;
+                                    }
+                                    var result = JSON.parse(responseText);
+                                    if (typeof result.s !== 'undefined') {
+                                        html5DOMDocument.insert(result.s);
+                                        globalCssAdded = true;
+                                    }
+                                    if (contentData !== null) {
+                                        create(contentData, false);
+                                    } else {
+                                        if (typeof result.c !== 'undefined') {
+                                            create(result.c, true);
+                                        } else {
+                                            handleError();
+                                        }
+                                    }
+                                });
+                            }).catch(handleError);
                         }).catch(handleError);
                     }).catch(handleError);
-                }).catch(handleError);
-            });
+                });
+            }
         };
 
         var close = function () { // return true if closed
@@ -319,7 +342,18 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             options = {};
         }
         var window = make();
-        window.open(name, data, options);
+        window.open(name, data, options, 'd'); // default
+        return window;
+    };
+
+    var openMessage = function (message) {
+        var options = {};
+        options.onOpen = function (windowContainer) {
+            windowContainer.querySelector('[data-modal-window-component="content-button-ok"]').addEventListener('click', closeCurrent);
+        };
+        options.closeOnEscKey = true;
+        var window = make();
+        window.open('', { 'm': message }, options, 'm'); // message
         return window;
     };
 
@@ -389,6 +423,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     return {
         'initialize': initialize,
         'open': open,
+        'openMessage': openMessage,
         'closeAll': closeAll,
         'closeCurrent': closeCurrent,
         'showLoading': showLoading,
