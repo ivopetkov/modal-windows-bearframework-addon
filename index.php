@@ -98,6 +98,7 @@ $app->serverRequests
                 $css .= '.ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"],
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"],
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"],
+                .ipmdlwndwsc [data-form-element-type="rich-textarea"] [data-form-element-component="textarea"],
                 .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"],
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="button"]{
                     width:100%;
@@ -114,10 +115,12 @@ $app->serverRequests
                     height:48px;
                     outline:none;
                 }
-                .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]{
+                .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"],
+                .ipmdlwndwsc [data-form-element-type="rich-textarea"] [data-form-element-component="textarea"]{
                     padding:12px 17px;
                     line-height:24px;
                     height:100px;
+                    overflow:auto;
                 }
                 .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]{
                     appearance:none;
@@ -172,6 +175,7 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="textbox"] [data-form-element-component="input"]:hover,
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"]:hover,
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:hover,
+                .ipmdlwndwsc [data-form-element-type="rich-textarea"] [data-form-element-component="textarea"]:hover,
                 .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:hover,
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="button"]:hover{
                     border:var(--modal-window-content-field-border-hover);
@@ -182,6 +186,8 @@ $app->serverRequests
                 .ipmdlwndwsc [data-form-element-type="password"] [data-form-element-component="input"]:focus,
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:active,
                 .ipmdlwndwsc [data-form-element-type="textarea"] [data-form-element-component="textarea"]:focus,
+                .ipmdlwndwsc [data-form-element-type="rich-textarea"] [data-form-element-component="textarea"]:active,
+                .ipmdlwndwsc [data-form-element-type="rich-textarea"] [data-form-element-component="textarea"]:focus,
                 .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:active,
                 .ipmdlwndwsc [data-form-element-type="select"] [data-form-element-component="select"]:focus,
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="button"]:active,
