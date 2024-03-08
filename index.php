@@ -462,7 +462,15 @@ $app->serverRequests
                     --tooltip-background-color:' . $fieldBackground . ';
                     --tooltip-border:var(--modal-window-content-field-border-active);
                     --tooltip-border-radius:var(--modal-window-content-field-border-radius);
-                    width:170px;
+                    width:120px;
+                }
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-hours-tooltip"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-minutes-tooltip"],
+                .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="time-seconds-tooltip"]{
+                    --tooltip-background-color:' . $fieldBackground . ';
+                    --tooltip-border:var(--modal-window-content-field-border-active);
+                    --tooltip-border-radius:var(--modal-window-content-field-border-radius);
+                    width:80px;
                 }
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="months"],
                 .ipmdlwndwsc [data-form-element-type="datetime"] [data-form-element-component="years"],
