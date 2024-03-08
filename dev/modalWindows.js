@@ -291,9 +291,15 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             }
         };
 
-        var close = function () { // return true if closed
+        var close = function (options) { // return true if closed
+            if (typeof options === "undefined") {
+                options = {};
+            }
+            var returnPromise = typeof options.returnPromise !== "undefined" ? options.returnPromise : false;
+            var expectOpen = typeof options.expectOpen !== "undefined" ? options.expectOpen : false;
             openVersion++;
             if (windowContainer !== null) {
+                var promiseResolve = null;
                 var previousWindow = windowContainer.previousSibling;
                 windowContainer.setAttribute('class', 'ipmdlwndwh');
                 window.setTimeout(function () {
@@ -305,14 +311,35 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                     if (previousWindow !== null) {
                         setWindowVisibility(previousWindow, true);
                     }
+                    if (expectOpen) {
+                        if (container === null || container.childNodes.length === 0) {
+                            closeLightbox();
+                        }
+                    }
+                    if (promiseResolve !== null) {
+                        promiseResolve(true);
+                    }
                 }, 300);
-                var remainingWindowsCount = container.childNodes.length - 1;
-                if (remainingWindowsCount === 0) {
-                    closeLightbox();
+                if (!expectOpen) {
+                    if (container.childNodes.length - 1 === 0) {
+                        closeLightbox();
+                    }
                 }
-                return true;
+                if (returnPromise) {
+                    return new Promise(function (resolve, reject) {
+                        promiseResolve = resolve;
+                    });
+                } else {
+                    return true;
+                }
             }
-            return false;
+            if (returnPromise) {
+                return new Promise(function (resolve, reject) {
+                    resolve(false);
+                });
+            } else {
+                return false;
+            }
         };
 
         var enable = function () {
@@ -331,7 +358,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
 
         return {
             'open': open,
-            'close': close,
+            'close': close, // Available options: expectOpen and returnPromise
             'enable': enable,
             'disable': disable,
         };
@@ -357,7 +384,10 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         return window;
     };
 
-    var closeAll = function () {
+    var closeAll = function (options) { // Available options: expectOpen
+        if (typeof options === "undefined") {
+            options = {};
+        }
         return new Promise(function (resolve, reject) {
             if (container !== null && container.childNodes.length > 0) {
                 var otherWindows = container.childNodes;
@@ -366,9 +396,11 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 }
                 var lastWindow = container.firstChild;
                 if (lastWindow !== null) {
-                    lastWindow.mwClose();
+                    options.returnPromise = true;
+                    lastWindow.mwClose(options).then(resolve);
+                } else {
+                    resolve();
                 }
-                resolve();
             } else {
                 openVersion++;
                 hideLoading()
@@ -378,13 +410,21 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         });
     };
 
-    var closeCurrent = function () {
-        if (container !== null) {
-            var lastWindow = container.lastChild;
-            if (lastWindow !== null) {
-                lastWindow.mwClose();
-            }
+    var closeCurrent = function (options) { // Available options: expectOpen
+        if (typeof options === "undefined") {
+            options = {};
         }
+        return new Promise(function (resolve, reject) {
+            if (container !== null) {
+                var lastWindow = container.lastChild;
+                if (lastWindow !== null) {
+                    options.returnPromise = true;
+                    lastWindow.mwClose(options).then(resolve);
+                    return;
+                }
+            }
+            resolve();
+        });
     };
 
     var hasOpened = function () {
