@@ -11,7 +11,7 @@ var ivoPetkov = ivoPetkov || {};
 ivoPetkov.bearFrameworkAddons = ivoPetkov.bearFrameworkAddons || {};
 ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modalWindows || (function () {
 
-    var globalCssAdded = false;
+    var globalHTMLAdded = false;
     var contentCache = {};
 
     var container = null;
@@ -164,7 +164,6 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                     setWindowVisibility(otherWindows[i], false);
                 }
             }
-
             var handleError = function () {
                 hideLoading();
                 if (container !== null) {
@@ -173,6 +172,28 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                         setWindowVisibility(previousWindow, true);
                     }
                 }
+            };
+
+            var addGlobalHTML = function (onDone, onFail, globalHTML) {
+                if (globalHTMLAdded) {
+                    onDone();
+                    return;
+                }
+                clientPackages.get('html5DOMDocument').then(function (html5DOMDocument) {
+                    if (globalHTML === null) {
+                        var element = document.head.querySelector('[type="ipmwg"]');
+                        if (element !== null) {
+                            globalHTML = element.getAttribute('data-content');
+                        }
+                    }
+                    if (globalHTML !== null) {
+                        html5DOMDocument.insert(globalHTML);
+                        globalHTMLAdded = true;
+                        onDone();
+                    } else {
+                        onFail();
+                    }
+                }).catch(handleError);
             };
 
             var cacheKey = name + '$' + type + '$' + JSON.stringify(data);
@@ -244,50 +265,73 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 var messageHTML = '<div data-modal-window-component="content-message">' + escapeText(data.m).split("\n").join('<br>') + '</div><div data-modal-window-component="content-button-ok">OK</div>';
                 contentData = { width: '400px', content: messageHTML };
             }
-            if (contentData !== null && globalCssAdded) {
-                showLightboxLoading(closeOnEscKey).then(function () {
-                    hideLightboxLoading(closeOnEscKey).then(function () {
-                        create(contentData, false);
-                    });
-                });
-            } else {
+
+            var continueOpen1 = function () {
                 showLightboxLoading(closeOnEscKey).then(function () {
                     if (typeof contentCache[cacheKey] !== 'undefined' && contentCache[cacheKey][1] > (new Date()).getTime()) {
-                        hideLightboxLoading(closeOnEscKey).then(function () {
-                            if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
-                                return;
-                            }
-                            create(contentCache[cacheKey][0], false);
-                        });
-                        return;
-                    }
-
-                    clientPackages.get('serverRequests').then(function (serverRequests) {
-                        clientPackages.get('html5DOMDocument').then(function (html5DOMDocument) {
-                            serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(contentData !== null ? {} : data), g: globalCssAdded ? 0 : 1 }).then(function (responseText) {
-                                hideLightboxLoading(closeOnEscKey).then(function () {
-                                    if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
-                                        return;
-                                    }
-                                    var result = JSON.parse(responseText);
-                                    if (typeof result.s !== 'undefined') {
-                                        html5DOMDocument.insert(result.s);
-                                        globalCssAdded = true;
-                                    }
-                                    if (contentData !== null) {
-                                        create(contentData, false);
-                                    } else {
-                                        if (typeof result.c !== 'undefined') {
-                                            create(result.c, true);
-                                        } else {
-                                            handleError();
+                        addGlobalHTML(function () {
+                            hideLightboxLoading(closeOnEscKey).then(function () {
+                                if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
+                                    return;
+                                }
+                                create(contentCache[cacheKey][0], false);
+                            });
+                        }, handleError, null); // there is preloaded global data or it's already added if there is cached content
+                    } else {
+                        var continueOpen3 = function () {
+                            clientPackages.get('serverRequests').then(function (serverRequests) {
+                                serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(contentData !== null ? {} : data), g: globalHTMLAdded ? 0 : 1 }).then(function (responseText) {
+                                    hideLightboxLoading(closeOnEscKey).then(function () {
+                                        if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
+                                            return;
                                         }
-                                    }
-                                });
+                                        var result = JSON.parse(responseText);
+                                        var continueOpen2 = function () {
+                                            if (contentData !== null) {
+                                                create(contentData, false);
+                                            } else {
+                                                if (typeof result.c !== 'undefined') {
+                                                    create(result.c, true);
+                                                } else {
+                                                    handleError();
+                                                }
+                                            }
+                                        };
+                                        if (typeof result.g !== 'undefined') {
+                                            addGlobalHTML(continueOpen2, handleError, result.g);
+                                        } else {
+                                            continueOpen2();
+                                        }
+                                    });
+                                }).catch(handleError);
                             }).catch(handleError);
-                        }).catch(handleError);
-                    }).catch(handleError);
+                        };
+                        addGlobalHTML(continueOpen3, continueOpen3, null);
+                    }
                 });
+            };
+
+            if (contentData !== null) {
+                showLightboxLoading(closeOnEscKey).then(function () {
+                    addGlobalHTML(function () {
+                        hideLightboxLoading(closeOnEscKey).then(function () {
+                            create(contentData, false);
+                        });
+                    }, function () {
+                        hideLightboxLoading(closeOnEscKey).then(function () {
+                            continueOpen1();
+                        });
+                    }, null);
+                });
+            } else {
+                if (type === 'd' && typeof contentCache[cacheKey] === 'undefined' && JSON.stringify(data) === '{}') {
+                    var preloadedContentDataElement = document.head.querySelector('[type="ipmw"][data-name="' + name + '"]');
+                    if (preloadedContentDataElement !== null) {
+                        var contentCachedData = JSON.parse(preloadedContentDataElement.getAttribute('data-content'));
+                        contentCache[cacheKey] = [contentCachedData, (new Date()).getTime() + contentCachedData.cacheTTL * 1000];
+                    }
+                }
+                continueOpen1();
             }
         };
 
@@ -457,7 +501,6 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 resolve();
             }).catch(reject);
         });
-
     };
 
     return {
