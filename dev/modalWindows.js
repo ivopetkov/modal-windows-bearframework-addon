@@ -341,6 +341,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             }
             var returnPromise = typeof options.returnPromise !== "undefined" ? options.returnPromise : false;
             var expectOpen = typeof options.expectOpen !== "undefined" ? options.expectOpen : false;
+            var expectShowLoading = typeof options.expectShowLoading !== "undefined" ? options.expectShowLoading : false;
             openVersion++;
             if (windowContainer !== null) {
                 var promiseResolve = null;
@@ -355,7 +356,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                     if (previousWindow !== null) {
                         setWindowVisibility(previousWindow, true);
                     }
-                    if (expectOpen) {
+                    if (expectOpen || expectShowLoading) {
                         if (container === null || container.childNodes.length === 0) {
                             closeLightbox();
                         }
@@ -364,7 +365,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                         promiseResolve(true);
                     }
                 }, 300);
-                if (!expectOpen) {
+                if (!expectOpen && !expectShowLoading) {
                     if (container.childNodes.length - 1 === 0) {
                         closeLightbox();
                     }
@@ -402,7 +403,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
 
         return {
             'open': open,
-            'close': close, // Available options: expectOpen and returnPromise
+            'close': close, // Available options: expectOpen, expectShowLoading and returnPromise
             'enable': enable,
             'disable': disable,
         };
@@ -428,7 +429,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         return window;
     };
 
-    var closeAll = function (options) { // Available options: expectOpen
+    var closeAll = function (options) { // Available options: expectOpen and expectShowLoading
         if (typeof options === "undefined") {
             options = {};
         }
@@ -454,7 +455,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         });
     };
 
-    var closeCurrent = function (options) { // Available options: expectOpen
+    var closeCurrent = function (options) { // Available options: expectOpen and expectShowLoading
         if (typeof options === "undefined") {
             options = {};
         }
