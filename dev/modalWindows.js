@@ -17,9 +17,11 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     var container = null;
 
     var closeButtonText = '';
+    var errorText = '';
 
     var initialize = function (data) {
         closeButtonText = data[0];
+        errorText = data[1];
         return this;
     };
 
@@ -418,7 +420,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         return window;
     };
 
-    var openMessage = function (message) {
+    var openMessage = function (message) { // todo open in new layer
         var options = {};
         options.onOpen = function (windowContainer) {
             windowContainer.querySelector('[data-modal-window-component="content-button-ok"]').addEventListener('click', closeCurrent);
@@ -427,6 +429,13 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         var window = make();
         window.open('', { 'm': message }, options, 'm'); // message
         return window;
+    };
+
+    var openError = function (message) {
+        if (typeof message === "undefined") {
+            message = errorText;
+        }
+        return openMessage(message);
     };
 
     var closeAll = function (options) { // Available options: expectOpen and expectShowLoading
@@ -508,6 +517,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         'initialize': initialize,
         'open': open,
         'openMessage': openMessage,
+        'openError': openError,
         'closeAll': closeAll,
         'closeCurrent': closeCurrent,
         'showLoading': showLoading,

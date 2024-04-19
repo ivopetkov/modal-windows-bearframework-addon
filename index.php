@@ -60,6 +60,9 @@ $app->clientPackages
         //$package->addJSCode(file_get_contents($context->dir . '/dev/modalWindows.js'));
         $package->embedPackage('lightbox');
 
-        $data = [__('ivopetkov.modalWindows.close')];
+        $data = [
+            __('ivopetkov.modalWindows.close'),
+            __('ivopetkov.modalWindows.error')
+        ];
         $package->get = 'return ivoPetkov.bearFrameworkAddons.modalWindows.initialize(' . json_encode($data) . ');';
     });
