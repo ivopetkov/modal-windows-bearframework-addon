@@ -18,10 +18,12 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
 
     var closeButtonText = '';
     var errorText = '';
+    var offlineText = '';
 
     var initialize = function (data) {
         closeButtonText = data[0];
         errorText = data[1];
+        offlineText = data[2];
         return this;
     };
 
@@ -438,6 +440,13 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         return openMessage(message);
     };
 
+    var openOffline = function (message) {
+        if (typeof message === "undefined") {
+            message = offlineText;
+        }
+        return openMessage(message);
+    };
+
     var closeAll = function (options) { // Available options: expectOpen and expectShowLoading
         if (typeof options === "undefined") {
             options = {};
@@ -518,6 +527,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         'open': open,
         'openMessage': openMessage,
         'openError': openError,
+        'openOffline': openOffline,
         'closeAll': closeAll,
         'closeCurrent': closeCurrent,
         'showLoading': showLoading,

@@ -62,7 +62,8 @@ $app->clientPackages
 
         $data = [
             __('ivopetkov.modalWindows.close'),
-            __('ivopetkov.modalWindows.error')
+            __('ivopetkov.modalWindows.error'),
+            __('ivopetkov.modalWindows.offline')
         ];
         $package->get = 'return ivoPetkov.bearFrameworkAddons.modalWindows.initialize(' . json_encode($data) . ');';
     });
