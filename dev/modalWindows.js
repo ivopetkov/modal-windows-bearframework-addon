@@ -155,12 +155,17 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             if (typeof options === 'undefined') {
                 options = {};
             }
+            if (windowContainer !== null) {
+                return false;
+            }
 
             openVersion++;
             var currentOpenVersion = openVersion;
 
             var onOpen = typeof options.onOpen !== 'undefined' ? options.onOpen : null;
+            var onFail = typeof options.onFail !== 'undefined' ? options.onFail : null;
             var closeOnEscKey = typeof options.closeOnEscKey !== 'undefined' ? options.closeOnEscKey : true;
+            var showErrors = typeof options.showErrors !== 'undefined' ? options.showErrors : false;
 
             if (container !== null) {
                 var otherWindows = container.childNodes;
@@ -169,7 +174,23 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 }
             }
             var handleError = function () {
-                hideLoading();
+                hideLoading().then(function () {
+                    if (showErrors) {
+                        var windowNavigator = window.navigator;
+                        if (typeof windowNavigator.onLine !== "undefined" && windowNavigator.onLine) {
+                            openError();
+                        } else {
+                            openOffline();
+                        }
+                    }
+                    if (onFail !== null) {
+                        try {
+                            onFail();
+                        } catch (e) {
+
+                        }
+                    }
+                });
                 if (container !== null) {
                     var previousWindow = container.lastChild;
                     if (previousWindow !== null) {
@@ -337,6 +358,8 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 }
                 continueOpen1();
             }
+
+            return true;
         };
 
         var close = function (options) { // return true if closed
@@ -347,12 +370,13 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             var expectOpen = typeof options.expectOpen !== "undefined" ? options.expectOpen : false;
             var expectShowLoading = typeof options.expectShowLoading !== "undefined" ? options.expectShowLoading : false;
             openVersion++;
-            if (windowContainer !== null) {
+            if (windowContainer !== null && container !== null) {
                 var promiseResolve = null;
                 var previousWindow = windowContainer.previousSibling;
                 windowContainer.setAttribute('class', 'ipmdlwndwh');
                 window.setTimeout(function () {
                     container.removeChild(windowContainer);
+                    windowContainer = null;
                     if (container.childNodes.length === 0) {
                         container.parentNode.removeChild(container);
                         container = null;
@@ -419,7 +443,17 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         }
         var window = make();
         window.open(name, data, options, 'd'); // default
-        return window;
+        return {
+            'close': function (options) { // Available options: expectOpen, expectShowLoading and returnPromise
+                return window.close(options);
+            },
+            'enable': function () {
+                window.enable();
+            },
+            'disable': function () {
+                window.disable();
+            }
+        };
     };
 
     var openMessage = function (message) { // todo open in new layer
@@ -427,10 +461,22 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         options.onOpen = function (windowContainer) {
             windowContainer.querySelector('[data-modal-window-component="content-button-ok"]').addEventListener('click', closeCurrent);
         };
+        var fallbackedToAlert = false;
+        options.onFail = function () { // temp while deciding how to load the global css effiently while offline
+            fallbackedToAlert = true;
+            alert(message);
+        };
         options.closeOnEscKey = true;
         var window = make();
         window.open('', { 'm': message }, options, 'm'); // message
-        return window;
+        return {
+            'close': function (options) { // Available options: expectOpen, expectShowLoading and returnPromise
+                if (fallbackedToAlert) {
+                    return false;
+                }
+                return window.close(options);
+            }
+        };
     };
 
     var openError = function (message) {
