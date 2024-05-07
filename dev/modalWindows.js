@@ -98,7 +98,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         return new Promise(function (resolve, reject) {
             if (lightboxStatus !== 1) { // not loading
                 lightboxStatus = 1;
-                clientPackages.get('lightbox').then(function (lightbox) { // its embeded
+                clientPackages.get('lightbox', { timeout: 15 }).then(function (lightbox) { // its embeded
                     lightboxContext = lightbox.make({ showCloseButton: false, spacing: 0, closeOnEscKey: closeOnEscKey, onBeforeEscKeyClose: onBeforeEscKeyClose });
                     resolve();
                 });
@@ -166,6 +166,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             var onFail = typeof options.onFail !== 'undefined' ? options.onFail : null;
             var closeOnEscKey = typeof options.closeOnEscKey !== 'undefined' ? options.closeOnEscKey : true;
             var showErrors = typeof options.showErrors !== 'undefined' ? options.showErrors : false;
+            var timeout = typeof options.timeout !== 'undefined' ? options.timeout : 30;
 
             if (container !== null) {
                 var otherWindows = container.childNodes;
@@ -204,7 +205,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                     onDone();
                     return;
                 }
-                clientPackages.get('html5DOMDocument').then(function (html5DOMDocument) {
+                clientPackages.get('html5DOMDocument', { timeout: 15 }).then(function (html5DOMDocument) {
                     if (globalHTML === null) {
                         var element = document.head.querySelector('[type="ipmwg"]');
                         if (element !== null) {
@@ -304,8 +305,8 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                         }, handleError, null); // there is preloaded global data or it's already added if there is cached content
                     } else {
                         var continueOpen3 = function () {
-                            clientPackages.get('serverRequests').then(function (serverRequests) {
-                                serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(contentData !== null ? {} : data), g: globalHTMLAdded ? 0 : 1 }).then(function (responseText) {
+                            clientPackages.get('serverRequests', { timeout: 15 }).then(function (serverRequests) {
+                                serverRequests.send('-modal-window-open', { i: name, d: JSON.stringify(contentData !== null ? {} : data), g: globalHTMLAdded ? 0 : 1 }, { timeout: timeout }).then(function (responseText) {
                                     hideLightboxLoading(closeOnEscKey).then(function () {
                                         if (openVersion !== currentOpenVersion || lightboxStatus !== 2) {
                                             return;
