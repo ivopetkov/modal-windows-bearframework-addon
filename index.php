@@ -59,7 +59,7 @@ $app->clientPackages
         $package->addJSCode(include $context->dir . '/assets/modalWindows.min.js.php');
         //$package->addJSCode(file_get_contents($context->dir . '/dev/modalWindows.js'));
         $package->embedPackage('lightbox');
-
+        $package->embedPackage('windowNavigation');
         $data = [
             __('ivopetkov.modalWindows.close'),
             __('ivopetkov.modalWindows.error'),

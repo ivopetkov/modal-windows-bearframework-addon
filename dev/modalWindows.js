@@ -20,6 +20,13 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     var errorText = '';
     var offlineText = '';
 
+    var idCounter = 0;
+    var idPrefix = 'mw-' + (new Date()).getTime().toString() + '-';
+    var getID = function () {
+        idCounter++;
+        return idPrefix + idCounter;
+    };
+
     var initialize = function (data) {
         closeButtonText = data[0];
         errorText = data[1];
@@ -55,6 +62,75 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         }, 16);
     };
 
+    // WINDOW NAVIGATION
+
+    var windowNavigation = null; // loaded after first showLightboxLoading
+    var isNavigationGoBackAfterHideLoading = false;
+    var isNavigationGoBackOnCloseCurrent = false;
+
+    var onWindowNavigationChange = function () {
+        if (isNavigationGoBackAfterHideLoading) {
+            return false;
+        }
+        if (isNavigationGoBackOnCloseCurrent) {
+            return false;
+        }
+        var windowID = windowNavigation.getData('ipmw');
+        if (windowID !== null) {
+            if (windowID === 'l') {
+
+            } else {
+                if (document.getElementById(windowID) !== null) {
+                    closeAll({ lastWindowID: windowID });
+                } else {
+                    if (windowID.indexOf(idPrefix) === -1) {
+                        closeAll();
+                    }
+                }
+            }
+        } else {
+            closeAll();
+        }
+    };
+
+    var addToWindowNavigation = function (id) {
+        windowNavigation.open(null, null, null, { ipmw: id }, false);
+    };
+
+    var addLoadingToNavigation = function () {
+        addToWindowNavigation('l');
+    };
+
+    var hideLoadingFromNavigation = function () {
+        if (windowNavigation.getData('ipmw') !== 'l') {
+            return Promise.resolve();
+        }
+        isNavigationGoBackAfterHideLoading = true;
+        return new Promise(function (resolve, reject) {
+            windowNavigation.goBack()
+                .then(function () {
+                    isNavigationGoBackAfterHideLoading = false;
+                    resolve();
+                });
+        });
+    };
+
+    var updateWindowNavigationOnCloseWindow = function (windowContainer) {
+        if (windowContainer.id === windowNavigation.getData('ipmw')) {
+            isNavigationGoBackOnCloseCurrent = true;
+            windowNavigation.goBack()
+                .then(function () {
+                    isNavigationGoBackOnCloseCurrent = false;
+                });
+        }
+    };
+
+    var addWindowToNavigation = function (windowContainer) {
+        addToWindowNavigation(windowContainer.id);
+    };
+
+    // LIGHTBOX
+
     var lightboxContext = null;
     var lightboxStatus = null; // 1 - loading, 2 - empty (no loading)
     var lightboxLoadingStatusCounter = 0;
@@ -67,6 +143,10 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             windowContainer.setAttribute('class', 'ipmdlwndwvh');
             windowContainer.setAttribute('inert', 'true');
         }
+    };
+
+    var isVisibleWindow = function (windowContainer) {
+        return windowContainer.getAttribute('class', 'ipmdlwndwv');
     };
 
     var onBeforeEscKeyClose = function () {
@@ -98,10 +178,22 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         return new Promise(function (resolve, reject) {
             if (lightboxStatus !== 1) { // not loading
                 lightboxStatus = 1;
-                clientPackages.get('lightbox', { timeout: 15 }).then(function (lightbox) { // its embeded
-                    lightboxContext = lightbox.make({ showCloseButton: false, spacing: 0, closeOnEscKey: closeOnEscKey, onBeforeEscKeyClose: onBeforeEscKeyClose });
-                    resolve();
-                });
+                var continueShow = function () {
+                    clientPackages.get('lightbox', { timeout: 15 }).then(function (lightbox) { // its embeded
+                        lightboxContext = lightbox.make({ showCloseButton: false, spacing: 0, closeOnEscKey: closeOnEscKey, onBeforeEscKeyClose: onBeforeEscKeyClose });
+                        addLoadingToNavigation();
+                        resolve();
+                    });
+                };
+                if (windowNavigation === null) {
+                    clientPackages.get('windowNavigation').then(function (wn) { // its embeded
+                        windowNavigation = wn;
+                        windowNavigation.addChangeHandler(onWindowNavigationChange);
+                        continueShow();
+                    });
+                } else {
+                    continueShow();
+                }
             } else {
                 resolve();
             }
@@ -120,7 +212,13 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         }
         if (lightboxStatus === 1) { // loading
             lightboxStatus = 2;
-            return lightboxContext.open('', { showCloseButton: false, spacing: 0, closeOnEscKey: closeOnEscKey, onBeforeEscKeyClose: onBeforeEscKeyClose, resolveBeforeHTMLAdded: true });
+            return new Promise(function (resolve, reject) {
+                hideLoadingFromNavigation().then(function () {
+                    lightboxContext.open('', { showCloseButton: false, spacing: 0, closeOnEscKey: closeOnEscKey, onBeforeEscKeyClose: onBeforeEscKeyClose, resolveBeforeHTMLAdded: true })
+                        .then(resolve)
+                        .catch(reject);
+                });
+            });
         } else {
             return new Promise(function (resolve, reject) {
                 resolve();
@@ -231,6 +329,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                     document.body.appendChild(container);
                 }
                 windowContainer = document.createElement('div');
+                windowContainer.setAttribute('id', getID());
                 windowContainer.setAttribute('data-form-tooltip-container', 'true'); // needed by ivopetkov/form-bearframework-addon
                 container.appendChild(windowContainer);
                 var html = '';
@@ -284,6 +383,8 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 if (addToCache && typeof contentData.cacheTTL !== 'undefined') {
                     contentCache[cacheKey] = [contentData, (new Date()).getTime() + contentData.cacheTTL * 1000];
                 }
+
+                addWindowToNavigation(windowContainer);
             };
 
             var contentData = null;
@@ -372,9 +473,13 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             var expectShowLoading = typeof options.expectShowLoading !== "undefined" ? options.expectShowLoading : false;
             openVersion++;
             if (windowContainer !== null && container !== null) {
+                var wasVisible = windowContainer.getAttribute('class') === 'ipmdlwndwv';
                 var promiseResolve = null;
                 var previousWindow = windowContainer.previousSibling;
                 windowContainer.setAttribute('class', 'ipmdlwndwh');
+                if (wasVisible) {
+                    updateWindowNavigationOnCloseWindow(windowContainer);
+                }
                 window.setTimeout(function () {
                     container.removeChild(windowContainer);
                     windowContainer = null;
@@ -494,13 +599,34 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
         return openMessage(message);
     };
 
-    var closeAll = function (options) { // Available options: expectOpen and expectShowLoading
+    var closeAll = function (options) { // Available options: expectOpen, expectShowLoading, lastWindowID
         if (typeof options === "undefined") {
             options = {};
         }
+        var lastWindowID = typeof options.lastWindowID !== 'undefined' ? options.lastWindowID : null;
         return new Promise(function (resolve, reject) {
             if (container !== null && container.childNodes.length > 0) {
                 var otherWindows = container.childNodes;
+                if (lastWindowID !== null) {
+                    var lastFound = false;
+                    for (var i = 0; i < otherWindows.length; i++) {
+                        var otherWindow = otherWindows[i];
+                        if (otherWindow.id === lastWindowID) {
+                            setWindowVisibility(otherWindow, true);
+                            lastFound = true;
+                        } else if (lastFound) {
+                            if (isVisibleWindow(otherWindow)) {
+                                otherWindow.mwClose();
+                            } else {
+                                container.removeChild(otherWindow);
+                            }
+                        }
+                    }
+                    if (lastFound) {
+                        resolve();
+                        return;
+                    }
+                }
                 for (var i = otherWindows.length - 2; i >= 0; i--) {
                     container.removeChild(otherWindows[i]);
                 }

@@ -23,7 +23,8 @@
         "ivopetkov/client-packages-bearframework-addon": "1.*",
         "ivopetkov/server-requests-bearframework-addon": "1.*",
         "ivopetkov/js-lightbox-bearframework-addon": "1.*",
-        "ivopetkov/html5-dom-document-js-bearframework-addon": "1.*"
+        "ivopetkov/html5-dom-document-js-bearframework-addon": "1.*",
+        "ivopetkov/window-navigation-js-bearframework-addon": "1.*"
     },
     "require-dev": {
         "bearframework/addon-tests": "1.*"
