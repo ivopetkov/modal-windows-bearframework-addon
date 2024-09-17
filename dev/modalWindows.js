@@ -67,12 +67,16 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
     var windowNavigation = null; // loaded after first showLightboxLoading
     var isNavigationGoBackAfterHideLoading = false;
     var isNavigationGoBackOnCloseCurrent = false;
+    var isNavigationOpenNewWindow = false;
 
     var onWindowNavigationChange = function () {
         if (isNavigationGoBackAfterHideLoading) {
             return false;
         }
         if (isNavigationGoBackOnCloseCurrent) {
+            return false;
+        }
+        if (isNavigationOpenNewWindow) {
             return false;
         }
         var windowID = windowNavigation.getData('ipmw');
@@ -369,13 +373,6 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                     form.addEventListener('submitstart', disable); // todo fix for multiple
                     form.addEventListener('submitend', enable);
                 }
-                window.setTimeout(function () {
-                    setWindowVisibility(windowContainer, true);
-                }, 16);
-
-                if (onOpen !== null) {
-                    onOpen(windowContainer);
-                }
 
                 windowContainer.mwClose = close;
                 windowContainer.mwCloseOnEscKey = closeOnEscKey;
@@ -384,7 +381,17 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                     contentCache[cacheKey] = [contentData, (new Date()).getTime() + contentData.cacheTTL * 1000];
                 }
 
+                isNavigationOpenNewWindow = true;
                 addWindowToNavigation(windowContainer);
+
+                window.setTimeout(function () {
+                    setWindowVisibility(windowContainer, true);
+                    isNavigationOpenNewWindow = false;
+                }, 16);
+
+                if (onOpen !== null) {
+                    onOpen(windowContainer);
+                }
             };
 
             var contentData = null;
