@@ -55,7 +55,7 @@ $app->serverRequests
     });
 
 $app->clientPackages
-    ->add('modalWindows', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($context) {
+    ->add('modalWindows', function (IvoPetkov\BearFrameworkAddons\ClientPackage $package) use ($context): void {
         $package->addJSCode(include $context->dir . '/assets/modalWindows.min.js.php');
         //$package->addJSCode(file_get_contents($context->dir . '/dev/modalWindows.js'));
         $package->embedPackage('lightbox');
