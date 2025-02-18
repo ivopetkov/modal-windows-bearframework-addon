@@ -269,6 +269,7 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
             var closeOnEscKey = typeof options.closeOnEscKey !== 'undefined' ? options.closeOnEscKey : true;
             var showErrors = typeof options.showErrors !== 'undefined' ? options.showErrors : false;
             var timeout = typeof options.timeout !== 'undefined' ? options.timeout : 30;
+            var title = typeof options.title !== 'undefined' ? options.title : null;
 
             if (container !== null) {
                 var otherWindows = container.childNodes;
@@ -361,8 +362,14 @@ ivoPetkov.bearFrameworkAddons.modalWindows = ivoPetkov.bearFrameworkAddons.modal
                 if (typeof contentData.width !== 'undefined') {
                     windowElement.style.width = contentData.width;
                 }
-                if (typeof contentData.title !== 'undefined') {
-                    titleElement.innerHTML = escapeText(contentData.title).split("\n").join("<br>");
+                var titleToSet = null;
+                if (title !== null) {
+                    titleToSet = title;
+                } else if (typeof contentData.title !== 'undefined') {
+                    titleToSet = contentData.title;
+                }
+                if (titleToSet !== null) {
+                    titleElement.innerHTML = escapeText(titleToSet).split("\n").join("<br>");
                 }
                 if (typeof contentData.content !== 'undefined') {
                     html5DOMDocument.insert(contentData.content, [contentElement]);
